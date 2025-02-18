@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Responsive Dashboard Design</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet" />
+    <link href="styles.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <i class="fas fa-bars menu-icon"></i>
+            <div class="profile">
+                <button class="select-buyer-btn" onclick="openBuyersPopup()">Mày là ai ???</button>
+                <i class="fas fa-sun theme-toggle"></i>
+                <img alt="User profile picture"
+                    src="https://xlymqphhcstxyogutnvm.supabase.co/storage/v1/object/public/1307/avatar/avatar1.png" />
+            </div>
+        </div>
+        <main>
+            <section id="schedule">
+                <div class="schedule">
+                    <h2>Lịch trực vệ sinh</h2>
+                    <ul></ul>
+                </div>
+            </section>
+            <section id="purchases">
+                <div class="purchases">
+                    <h2>Chi tiêu</h2>
+                    <button class="add-btn" onclick="openForm()">Thêm</button>
+                    <ul></ul>
+                </div>
+            </section>
+            <section id="money">
+                <div class="purchases">
+                    <h2>Tổng kết tháng</h2>
+                    <ul></ul>
+                </div>
+            </section>
+            <section id="user">
+                <div class="schedule">
+                    <h2>Thành viên</h2>
+                    <ul></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+    <div class="overlay" onclick="closeForm(); closeBuyersPopup();"></div>
+    <div class="popup-form">
+        <form onsubmit="addProduct(event)">
+            <input id="buyer" placeholder="Mày là ai?" required="" type="text" />
+            <input id="product" placeholder="Mua gì?" required="" type="text" />
+            <input id="price" placeholder="Nhiêu?" required="" type="number" />
+            <input id="date" placeholder="Hồi nàooo?" required="" type="date" />
+            <button type="submit">Thêm</button>
+            <button class="close-btn" onclick="closeForm()" type="button">Đóng</button>
+        </form>
+    </div>
+    <div class="popup-buyers">
+        <h2>Select Buyer</h2>
+        <ul></ul>
+        <button class="close-btn" onclick="closeBuyersPopup()" type="button">Close</button>
+    </div>
+    <nav>
+        <ul class="max-w-md mx-auto flex justify-around p-4">
+            <a href="#schedule" class="nav-item">
+                <i class="fas fa-calendar-alt text-2xl"></i>
+            </a>
+            <a href="#purchases" class="nav-item">
+                <i class="fas fa-credit-card text-2xl"></i>
+            </a>
+            <a href="#money" class="nav-item">
+                <i class="fas fa-dollar-sign text-2xl"></i>
+            </a>
+            <a href="#user" class="nav-item">
+                <i class="fas fa-user text-2xl"></i>
+            </a>
+        </ul>
+    </nav>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script/supabase.js"></script>
+    <script src="script/script.js"></script>
+</body>
+
+</html>
