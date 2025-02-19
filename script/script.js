@@ -1,131 +1,18 @@
 let selectedBuyer = null;
 let isLoadProductsPurchased = false;
+const supabaseService = new SupabaseService(SUPABASE_URL, SUPABASE_KEY);
 
+// Init
 document.addEventListener("DOMContentLoaded", () => {
-  fetchBuyers();
-  fetchCleaningSchedule();
-  fetchProductsPurchased();
-  HandelNav();
+  const membersController = new MembersController(supabaseService);
+  const scheduleController = new ScheduleController(supabaseService);
+  const expensesController = new ExpensesController(supabaseService);
+
+  membersController.showMember();
+  scheduleController.showCleaningSchedule();
+  expensesController.showExpenses();
+  showNav();
 });
-
-// Buyers
-async function fetchBuyers() {
-  try {
-    const buyers = await supabaseService.getUsers();
-    if (buyers.length > 0) {
-      populateBuyersList(buyers);
-    }
-    console.log("Users:", buyers);
-  } catch (error) {
-    console.error("Error:", error.message);
-  }
-}
-
-function populateBuyersList(buyers) {
-  const buyersList = document.querySelector(".popup-buyers ul");
-  buyersList.innerHTML = buyers
-    .map(
-      (buyer) => `
-    <li>
-      <button onclick="selectBuyer({name: '${buyer.name}', image: '${buyer.image_url}'})">${buyer.name}</button>
-      </li>
-    `
-    )
-    .join("");
-}
-
-// CleaningSchedule
-async function fetchCleaningSchedule() {
-  try {
-    const cleaningSchedule = await supabaseService.getCleaningSchedule();
-    console.log("CleaningSchedule:", cleaningSchedule);
-    populateCleaningSchedule(cleaningSchedule);
-    highlightCurrentDay();
-  } catch (error) {
-    console.error("Error:", error.message);
-  }
-}
-
-function populateCleaningSchedule(schedule) {
-  const scheduleList = document.querySelector(".schedule ul");
-  scheduleList.innerHTML = schedule
-    .map(
-      (item) => `
-      <li>
-        <span>${item.day_of_week}: ${item.name}</span>
-      </li>
-    `
-    )
-    .join("");
-}
-
-function highlightCurrentDay() {
-  const days = [
-    "Chủ nhật",
-    "Thứ 2",
-    "Thứ 3",
-    "Thứ 4",
-    "Thứ 5",
-    "Thứ 6",
-    "Thứ 7",
-  ];
-  const currentDay = days[new Date().getDay()];
-  const scheduleItems = document.querySelectorAll(".schedule li");
-  scheduleItems.forEach((item) => {
-    if (item.textContent.includes(currentDay)) {
-      item.classList.add("current-day");
-    }
-  });
-}
-
-// Products Purchased
-async function fetchProductsPurchased() {
-  try {
-    const purchases = await supabaseService.getProductsPurchased();
-    console.log("ProductsPurchased:", purchases);
-    renderPurchases(purchases);
-  } catch (error) {
-    console.error("Error:", error.message);
-  }
-}
-
-function renderPurchases(purchases) {
-  const ul = document.querySelector(".purchases ul");
-  ul.innerHTML = "";
-
-  const groupedPurchases = purchases.reduce((acc, purchase) => {
-    if (!acc[purchase.buyer]) {
-      acc[purchase.buyer] = { total: 0, items: [] };
-    }
-    acc[purchase.buyer].total += purchase.price;
-    acc[purchase.buyer].items.push(purchase);
-    return acc;
-  }, {});
-
-  for (const buyer in groupedPurchases) {
-    const li = document.createElement("li");
-    li.innerHTML = `
-              <span>${buyer}</span>
-              <span>Total Price: $${groupedPurchases[buyer].total}</span>
-              <button class="details-btn" onclick="toggleDetails(this)">Chi Tiết</button>
-              <div class="details">
-                ${groupedPurchases[buyer].items
-                  .map(
-                    (item) => `
-                    <div class="details-item">
-                    <p>Product Name: ${item.product}</p>
-                    <p>Price: $${item.price}</p>
-                    <p>Purchase Date: ${item.date}</p>
-                    <button class="edit-btn">Edit</button>
-                    </div>
-                `
-                  )
-                  .join("")}
-              </div>
-        `;
-    ul.appendChild(li);
-  }
-}
 
 // Event
 function selectBuyer(buyer) {
@@ -190,28 +77,7 @@ function addProduct(event) {
   closeForm();
 }
 
-function changePage(page) {
-  const schedule = document.querySelector(".schedule");
-  const purchases = document.querySelector(".purchases");
-  switch (page) {
-    case 1:
-      schedule.style.display = "block";
-      purchases.style.display = "none";
-      break;
-    case 2:
-      if (!isLoadProductsPurchased) {
-        fetchProductsPurchased();
-      }
-      schedule.style.display = "none";
-      purchases.style.display = "block";
-      break;
-
-    default:
-      break;
-  }
-}
-
-function HandelNav() {
+function showNav() {
   const navItems = document.querySelectorAll(".nav-item");
 
   // Thêm sự kiện click cho mỗi liên kết
@@ -246,3 +112,30 @@ function HandelNav() {
   navItems[0].classList.add("active");
   document.getElementById("schedule").style.display = "block";
 }
+
+  // Card start
+  let startX;
+  let currentCard;
+
+  function handleTouchStart(event) {
+    startX = event.touches[0].clientX;
+    currentCard = event.currentTarget;
+  }
+
+  function handleTouchMove(event) {
+    if (!startX) return;
+    const currentX = event.touches[0].clientX;
+    const diffX = startX - currentX;
+
+    if (diffX > 0) {
+      currentCard.classList.add("swiped");
+    } else {
+      currentCard.classList.remove("swiped");
+    }
+  }
+
+  function handleTouchEnd(event) {
+    startX = null;
+    currentCard = null;
+  }
+  // Card end

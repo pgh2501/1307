@@ -31,8 +31,8 @@
             <section id="purchases">
                 <div class="purchases">
                     <h2>Chi tiêu</h2>
-                    <button class="add-btn" onclick="openForm()">Thêm</button>
                     <ul></ul>
+                    <button class="add-btn" onclick="openForm()">Thêm</button>
                 </div>
             </section>
             <section id="money">
@@ -41,10 +41,11 @@
                     <ul></ul>
                 </div>
             </section>
-            <section id="user">
-                <div class="schedule">
+            <section id="members">
+                <div class="members">
                     <h2>Thành viên</h2>
                     <ul></ul>
+                    <button class="add-btn" onclick="openForm()">Thêm</button>
                 </div>
             </section>
         </main>
@@ -61,28 +62,32 @@
         </form>
     </div>
     <div class="popup-buyers">
-        <h2>Select Buyer</h2>
+        <h2>Tao là...</h2>
         <ul></ul>
-        <button class="close-btn" onclick="closeBuyersPopup()" type="button">Close</button>
+        <button class="close-btn" onclick="closeBuyersPopup()" type="button">Đóng</button>
     </div>
     <nav>
         <ul class="max-w-md mx-auto flex justify-around p-4">
             <a href="#schedule" class="nav-item">
-                <i class="fas fa-calendar-alt text-2xl"></i>
+                <i class="fas fa-calendar-alt"></i>
             </a>
             <a href="#purchases" class="nav-item">
-                <i class="fas fa-credit-card text-2xl"></i>
+                <i class="fas fa-credit-card"></i>
             </a>
             <a href="#money" class="nav-item">
-                <i class="fas fa-dollar-sign text-2xl"></i>
+                <i class="fas fa-dollar-sign"></i>
             </a>
-            <a href="#user" class="nav-item">
-                <i class="fas fa-user text-2xl"></i>
+            <a href="#members" class="nav-item">
+                <i class="fas fa-user"></i>
             </a>
         </ul>
     </nav>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script/supabase.js"></script>
+    <script src="script/controller/membersController.js"></script>
+    <script src="script/controller/scheduleController.js"></script>
+    <script src="script/controller/expensesController.js"></script>
+    <script src="script/controller/rentController.js"></script>
     <script src="script/script.js"></script>
 </body>
 

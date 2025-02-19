@@ -12,10 +12,17 @@ body {
 }
 
 .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
+    padding: 10px;
 }
 
 .header .menu-icon {
@@ -51,27 +58,41 @@ body {
     margin-right: 10px;
 }
 
-/* common */
+/* main start */
+main {
+    flex: 1;
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+    overflow-y: auto;
+}
+
+/* main end */
+
+/* common start */
 .schedule,
-.purchases {
+.purchases,
+.members {
     margin-top: 20px;
 }
 
 .schedule h2,
-.purchases h2 {
+.purchases h2,
+.members h2 {
     font-size: 24px;
     font-weight: 700;
     margin-bottom: 20px;
 }
 
 .schedule ul,
-.purchases ul {
+.purchases ul,
+.members ul {
     list-style: none;
     padding: 0;
 }
 
 .schedule li,
-.purchases li {
+.purchases li,
+.members li {
     background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -82,13 +103,17 @@ body {
     align-items: center;
 }
 
-/* common */
+/* common end*/
 
+/* schedule start */
 .schedule li.current-day {
     background-color: #0984e3;
     color: #fff;
 }
 
+/* schedule end */
+
+/* purchases start */
 .purchases li .details {
     display: none;
     margin-top: 10px;
@@ -106,8 +131,7 @@ body {
     margin: 5px 0;
 }
 
-.purchases li .details-btn {
-    background-color: #0984e3;
+.purchases button {
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -115,7 +139,24 @@ body {
     cursor: pointer;
 }
 
+.purchases li .details-btn {
+    background-color: #0984e3;
+}
+
 .purchases .add-btn {
+    background-color: #00b894;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.purchases .edit-btn {
+    background-color: #00b894;
+}
+
+/* purchases end */
+
+/* members start */
+.members button {
     background-color: #00b894;
     color: #fff;
     border: none;
@@ -125,15 +166,18 @@ body {
     margin-bottom: 20px;
 }
 
-.purchases .edit-btn {
+.members .add-btn {
     background-color: #00b894;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
+    width: 100%;
 }
 
+.members .remove-btn {
+    background-color: #d63031;
+}
+
+/* members end */
+
+/* popup start */
 .popup-form,
 .popup-buyers {
     display: none;
@@ -180,6 +224,8 @@ body {
     margin: 0;
 }
 
+/* popup end */
+
 .overlay {
     display: none;
     position: fixed;
@@ -201,30 +247,17 @@ nav {
     box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-nav .max-w-md {
+nav ul {
     max-width: 28rem;
-}
-
-nav .mx-auto {
     margin-left: auto;
     margin-right: auto;
-}
-
-nav .flex {
     display: flex;
-}
-
-nav .justify-around {
     justify-content: space-around;
-}
-
-nav .p-4 {
     padding: 1rem;
 }
 
 nav a {
     color: #718096;
-    /* text-gray-600 */
 }
 
 nav .active {
@@ -233,14 +266,59 @@ nav .active {
 
 nav a:hover {
     color: #4299e1;
-    /* hover:text-blue-500 */
 }
 
-nav .text-2xl {
+nav i {
     font-size: 1.5rem;
 }
 
 /* nav end */
+
+/* card start */
+.card {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    background-color: #0984e3;
+    color: white;
+}
+
+.card-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    transition: transform 0.3s ease;
+}
+
+.card-remove {
+    background-color: #ef4444;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.card.swiped .card-content {
+    transform: translateX(-100px);
+}
+
+.card.swiped .card-remove {
+    transform: translateX(0);
+}
+
+/* card end */
 
 @media (min-width: 769px) {
     nav {
@@ -277,11 +355,11 @@ nav .text-2xl {
     }
 
     /* test */
-    .purchases li>button.details-btn {
+    /* .purchases li>button.details-btn {
         padding: 5px 10px;
     }
 
     .purchases .edit-btn {
         padding: 5px 10px;
-    }
+    } */
 }

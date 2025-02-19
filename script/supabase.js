@@ -83,5 +83,3 @@ class SupabaseService {
     return result;
   }
 }
-
-const supabaseService = new SupabaseService(SUPABASE_URL, SUPABASE_KEY);
