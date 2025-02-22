@@ -1,10 +1,15 @@
-const SUPABASE_URL = "https://xlymqphhcstxyogutnvm.supabase.co";
+// const SUPABASE_URL = "https://xlymqphhcstxyogutnvm.supabase.co";
+// const SUPABASE_KEY =
+//   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhseW1xcGhoY3N0eHlvZ3V0bnZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MTA0MzcsImV4cCI6MjA1MjA4NjQzN30.6osZdbJCDKfqupnJe-APntn2F2KvGaDX_azXaDXNwZc";
+
+// V2
+const SUPABASE_URL = "https://glaeuevvtsavesqrdhcr.supabase.co";
 const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhseW1xcGhoY3N0eHlvZ3V0bnZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY1MTA0MzcsImV4cCI6MjA1MjA4NjQzN30.6osZdbJCDKfqupnJe-APntn2F2KvGaDX_azXaDXNwZc";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsYWV1ZXZ2dHNhdmVzcXJkaGNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5NzkzODcsImV4cCI6MjA1NTU1NTM4N30.01lbnToxXsAbGi6JQmv4HkcDnxIOF_HLcJcYAzHyoh8";
 
 class SupabaseService {
   static instance;
-
+  bucketName = "1307";
   constructor(supabaseUrl, supabaseKey) {
     if (SupabaseService.instance) {
       return SupabaseService.instance; // Trả về instance đã tồn tại
@@ -18,15 +23,87 @@ class SupabaseService {
     SupabaseService.instance = this; // Lưu instance vào static property
   }
 
+  // Common
+  async uploadFile(filePath, file) {
+    const { data, error } = await this.supabase.storage
+      .from(this.bucketName)
+      .upload(filePath, file);
+    if (error) {
+      throw new Error(`Lỗi tải lên file: ${error.message}`);
+    }
+    return data;
+  }
+
+  async deleteFile(filePath) {
+    const { data, error } = await this.supabase.storage
+      .from(this.bucketName)
+      .remove([filePath]);
+    if (error) {
+      throw new Error(`Failed to fetch member: ${error.message}`);
+    }
+    return { data };
+  }
+
+  async getFilePublicUrl(filePath) {
+    const { data } = this.supabase.storage
+      .from(this.bucketName)
+      .getPublicUrl(filePath);
+    return data.publicUrl;
+  }
+
   // Users
-  async getUsers() {
+  async getMembers() {
     const { data, error } = await this.supabase
-      .from("Users")
+      .from("members")
       .select("*")
-      .eq("is_visible", true)
+      .eq("active", true)
       .order("id", { ascending: true });
     if (error) {
-      throw new Error(`Failed to fetch users: ${error.message}`);
+      throw new Error(`Failed to fetch member: ${error.message}`);
+    }
+    return data;
+  }
+
+  async addMember(sName, sImageUrl) {
+    const { data, error } = await this.supabase
+      .from("members")
+      .insert([
+        {
+          name: sName,
+          image_url: sImageUrl,
+        },
+      ])
+      .select();
+    if (error) {
+      throw new Error(`Failed to add members: ${error.message}`);
+    }
+    return data;
+  }
+
+  async updateMember(iMemberId, sName, sImageUrl) {
+    let updateData = { name: sName };
+    if (sImageUrl) {
+      updateData.image_url = sImageUrl;
+    }
+    const { data, error } = await this.supabase
+      .from("members")
+      .update(updateData)
+      .eq("id", iMemberId)
+      .select();
+    if (error) {
+      throw new Error(`Failed to update members: ${error.message}`);
+    }
+    return data;
+  }
+
+  async deleteMember(iMemberId) {
+    const { data, error } = await this.supabase
+      .from("members")
+      .update({ active: "false" })
+      .eq("id", iMemberId)
+      .select();
+    if (error) {
+      throw new Error(`Failed to delete members: ${error.message}`);
     }
     return data;
   }

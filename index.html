@@ -11,16 +11,15 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <i class="fas fa-bars menu-icon"></i>
-            <div class="profile">
-                <button class="select-buyer-btn" onclick="openBuyersPopup()">Mày là ai ???</button>
-                <i class="fas fa-sun theme-toggle"></i>
-                <img alt="User profile picture"
-                    src="https://xlymqphhcstxyogutnvm.supabase.co/storage/v1/object/public/1307/avatar/avatar1.png" />
-            </div>
+    <header>
+        <i class="fas fa-bars menu-icon" onclick="testt();"></i>
+        <div class="profile">
+            <button class="select-buyer-btn" onclick="openForm('headerMemberPopup')">Mày là ai ???</button>
+            <i class="fas fa-sun theme-toggle"></i>
+            <img alt="User profile picture" src="assets/avatarDefault.png" />
         </div>
+    </header>
+    <div class="container">
         <main>
             <section id="schedule">
                 <div class="schedule">
@@ -32,26 +31,55 @@
                 <div class="purchases">
                     <h2>Chi tiêu</h2>
                     <ul></ul>
-                    <button class="add-btn" onclick="openForm()">Thêm</button>
+                    <button class="add-btn" onclick="openForm('addProductPopup')">Thêm</button>
                 </div>
             </section>
             <section id="money">
                 <div class="purchases">
-                    <h2>Tổng kết tháng</h2>
+                    <h2>Cho con Dương xài</h2>
                     <ul></ul>
                 </div>
             </section>
             <section id="members">
                 <div class="members">
-                    <h2>Thành viên</h2>
+                    <h2>Người trong gian nhà</h2>
                     <ul></ul>
-                    <button class="add-btn" onclick="openForm()">Thêm</button>
+                    <button class="add-btn" onclick="openForm('addMemberPopup')">Thêm</button>
                 </div>
             </section>
         </main>
     </div>
-    <div class="overlay" onclick="closeForm(); closeBuyersPopup();"></div>
-    <div class="popup-form">
+    <nav>
+        <ul>
+            <li>
+                <a href="#schedule" class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#purchases" class="nav-item">
+                    <i class="fas fa-credit-card"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#money" class="nav-item">
+                    <i class="fas fa-dollar-sign"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#members" class="nav-item">
+                    <i class="fas fa-user"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div class="overlay" onclick="closeForm();"></div>
+    <div id="headerMemberPopup" class="popup-form">
+        <h2>Tao là...</h2>
+        <ul></ul>
+        <button class="close-btn" onclick="closeForm()" type="button">Đóng</button>
+    </div>
+    <div id="addProductPopup" class="popup-form">
         <form onsubmit="addProduct(event)">
             <input id="buyer" placeholder="Mày là ai?" required="" type="text" />
             <input id="product" placeholder="Mua gì?" required="" type="text" />
@@ -61,27 +89,22 @@
             <button class="close-btn" onclick="closeForm()" type="button">Đóng</button>
         </form>
     </div>
-    <div class="popup-buyers">
-        <h2>Tao là...</h2>
-        <ul></ul>
-        <button class="close-btn" onclick="closeBuyersPopup()" type="button">Đóng</button>
+    <div id="addMemberPopup" class="popup-form">
+        <form onsubmit="upsertMember(event)" id="upsertMemberForm">
+            <input type="text" id="memberName" name="memberName" placeholder="Tên" required>
+            <img src="assets/avatarDefault.png" alt=" " id="memberAvatarPreview">
+            <input type="file" id="memberAvatar" name="memberAvatar" accept="image/*" style="display: none;">
+            <input type="hidden" id="memberId" name="memberId" value="0">
+            <input type="hidden" id="memberOldImageUrl" name="memberOldImageUrl">
+            <button type="submit" id="memberBtnSubmit">Thêm</button>
+            <button class="close-btn" onclick="closeForm()" type="button">Đóng</button>
+        </form>
     </div>
-    <nav>
-        <ul class="max-w-md mx-auto flex justify-around p-4">
-            <a href="#schedule" class="nav-item">
-                <i class="fas fa-calendar-alt"></i>
-            </a>
-            <a href="#purchases" class="nav-item">
-                <i class="fas fa-credit-card"></i>
-            </a>
-            <a href="#money" class="nav-item">
-                <i class="fas fa-dollar-sign"></i>
-            </a>
-            <a href="#members" class="nav-item">
-                <i class="fas fa-user"></i>
-            </a>
-        </ul>
-    </nav>
+    <div id="messageConfirmPopup" class="popup-form">
+        <h2 id="confirmMessage">Bạn có chắc chắn?</h2>
+        <button id="confirmYes">Có</button>
+        <button id="confirmNo" class="close-btn">Không</button>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="script/supabase.js"></script>
     <script src="script/controller/membersController.js"></script>
@@ -89,6 +112,7 @@
     <script src="script/controller/expensesController.js"></script>
     <script src="script/controller/rentController.js"></script>
     <script src="script/script.js"></script>
+    <script src="script/scriptTest.js"></script>
 </body>
 
 </html>

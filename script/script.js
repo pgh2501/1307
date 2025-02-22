@@ -1,68 +1,127 @@
 let selectedBuyer = null;
+let currentPopup = null;
 let isLoadProductsPurchased = false;
 const supabaseService = new SupabaseService(SUPABASE_URL, SUPABASE_KEY);
+const membersController = new MembersController(supabaseService);
+const scheduleController = new ScheduleController(supabaseService);
+const expensesController = new ExpensesController(supabaseService);
 
-// Init
+// Init--------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
-  const membersController = new MembersController(supabaseService);
-  const scheduleController = new ScheduleController(supabaseService);
-  const expensesController = new ExpensesController(supabaseService);
-
-  membersController.showMember();
-  scheduleController.showCleaningSchedule();
-  expensesController.showExpenses();
+  membersController.init();
+  // scheduleController.showCleaningSchedule();
+  // expensesController.showExpenses();
   showNav();
 });
+// Init end
 
-// Event
-function selectBuyer(buyer) {
-  const selectBuyerBtn = document.querySelector(".select-buyer-btn");
-  const profileImg = document.querySelector(".profile img");
-
-  profileImg.src = buyer.image;
-  selectedBuyer = buyer;
-
-  selectBuyerBtn.textContent = buyer.name;
-
-  closeBuyersPopup();
-}
-
-function openBuyersPopup() {
-  document.querySelector(".popup-buyers").style.display = "block";
-  document.querySelector(".overlay").style.display = "block";
-}
-
-function closeBuyersPopup() {
-  document.querySelector(".popup-buyers").style.display = "none";
-  document.querySelector(".overlay").style.display = "none";
-}
-
-function toggleDetails(button) {
-  const details = button.nextElementSibling;
-  if (details.style.display === "none" || details.style.display === "") {
-    details.style.display = "block";
-    button.textContent = "Ẩn";
-  } else {
-    details.style.display = "none";
-    button.textContent = "Chi Tiết";
-  }
-}
-
-function openForm() {
-  const buyerInput = document.querySelector("#buyer");
-  if (selectedBuyer) {
-    buyerInput.value = selectedBuyer.name;
-    buyerInput.readOnly = true;
-  } else {
-    buyerInput.value = "";
-  }
-  document.querySelector(".popup-form").style.display = "block";
-  document.querySelector(".overlay").style.display = "block";
+// Event start--------------------------------------------------------------------
+// Popup start---------------------------
+function openForm(popupId) {
+  currentPopup = document.getElementById(popupId);
+  currentPopup.classList.add("active");
+  document.querySelector(".overlay").classList.add("active");
 }
 
 function closeForm() {
-  document.querySelector(".popup-form").style.display = "none";
-  document.querySelector(".overlay").style.display = "none";
+  currentPopup.classList.remove("active");
+  document.querySelector(".overlay").classList.remove("active");
+  resetForm(currentPopup);
+}
+
+function resetForm(currentPopup) {
+  if (currentPopup) {
+    const form = currentPopup.querySelector("form");
+    if (form) {
+      // Reset các input text, number, date, email, v.v.
+      form
+        .querySelectorAll(
+          'input[type="text"], input[type="number"], input[type="date"], input[type="email"]'
+        )
+        .forEach((input) => {
+          input.value = "";
+        });
+
+      // Reset các input file
+      form.querySelectorAll('input[type="file"]').forEach((input) => {
+        input.value = ""; // Đặt lại giá trị của input file
+      });
+
+      // MemberPopup
+      if (currentPopup.id === "addMemberPopup") {
+        // Đặt lại ảnh mặc định
+        const avatarPreview = form.querySelector("#memberAvatarPreview");
+        if (avatarPreview) {
+          avatarPreview.src = "assets/avatarDefault.png";
+        }
+
+        // Đặt lại memberId
+        form.querySelectorAll('input[type="hidden"]').forEach((input) => {
+          input.value = 0;
+        });
+      }
+    }
+  }
+}
+
+function showMessageConfirm(message) {
+  return new Promise((resolve) => {
+    const confirmPopup = document.getElementById("messageConfirmPopup");
+    const confirmMessage = document.getElementById("confirmMessage");
+    const confirmYes = document.getElementById("confirmYes");
+    const confirmNo = document.getElementById("confirmNo");
+
+    confirmMessage.textContent = message;
+
+    confirmYes.onclick = () => {
+      resolve(true);
+      closeConfirmPopup();
+    };
+
+    confirmNo.onclick = () => {
+      resolve(false);
+      closeConfirmPopup();
+    };
+
+    confirmPopup.classList.add("active");
+    document.querySelector(".overlay").classList.add("active");
+
+    function closeConfirmPopup() {
+      confirmPopup.classList.remove("active");
+      document.querySelector(".overlay").classList.remove("active");
+      confirmYes.onclick = null;
+      confirmNo.onclick = null;
+    }
+  });
+}
+
+function openFormUpdateMember(popupId, member) {
+  // Hiển thị thông tin member
+  if (member) {
+    document.getElementById("memberId").value = member.id;
+    document.getElementById("memberOldImageUrl").value = member.image;
+    document.getElementById("memberName").value = member.name;
+    document.getElementById("memberAvatarPreview").src =
+      member.image || "assets/avatarDefault.png";
+    document.getElementById("memberBtnSubmit").textContent = "Lưu";
+  }
+  openForm(popupId);
+}
+
+function selectHeaderMember(buyer) {
+  const selectBuyerBtn = document.querySelector(".select-buyer-btn");
+  const profileImg = document.querySelector(".profile img");
+
+  selectedBuyer = buyer;
+
+  if (buyer.image) {
+    profileImg.src = buyer.image;
+  } else {
+    profileImg.src = "assets/avatarDefault.png";
+  }
+  selectBuyerBtn.textContent = buyer.name;
+
+  closeForm();
 }
 
 function addProduct(event) {
@@ -75,6 +134,56 @@ function addProduct(event) {
   purchases.push({ buyer, product, price, date });
   renderPurchases();
   closeForm();
+}
+
+function upsertMember(event) {
+  event.preventDefault();
+  const form = document.getElementById("upsertMemberForm");
+  const formData = new FormData(form);
+
+  // Get input
+  const memberName = formData.get("memberName");
+  const memberAvatar = formData.get("memberAvatar");
+  const memberId = formData.get("memberId");
+
+  if (parseInt(memberId) === 0) {
+    membersController.addMember(memberName.trim(), memberAvatar);
+  } else {
+    const memberOldImageUrl = formData.get("memberOldImageUrl");
+    membersController.updateMember(
+      memberId,
+      memberName.trim(),
+      memberAvatar,
+      memberOldImageUrl
+    );
+  }
+  closeForm();
+}
+
+async function removeMember(memberId) {
+  const confirmed = await showMessageConfirm("M chắc chưa?");
+  if (confirmed) {
+    // Xử lý xóa thành viên
+    membersController.removeMember(memberId);
+  }
+}
+
+// function removeMember(memberId) {
+//   const returnValue = openForm("messageConfirmPopup");
+//   if (returnValue) {
+//     // membersController.removeMember(memberId);
+//   }
+// }
+// Popup end---------------------------
+function toggleDetails(button) {
+  const details = button.nextElementSibling;
+  if (details.style.display === "none" || details.style.display === "") {
+    details.style.display = "block";
+    button.textContent = "Ẩn";
+  } else {
+    details.style.display = "none";
+    button.textContent = "Chi Tiết";
+  }
 }
 
 function showNav() {
@@ -98,44 +207,44 @@ function showNav() {
 
       // Ẩn tất cả các phần
       document.querySelectorAll("section").forEach((section) => {
-        section.style.display = "none";
+        section.classList.remove("active");
       });
 
       // Hiển thị phần tương ứng
       if (targetSection) {
-        targetSection.style.display = "block";
+        targetSection.classList.add("active");
       }
     });
   });
 
   // Khởi tạo: chọn liên kết đầu tiên và hiển thị phần tương ứng
   navItems[0].classList.add("active");
-  document.getElementById("schedule").style.display = "block";
+  document.getElementById("schedule").classList.add("active");
+}
+// Event end
+// Card start--------------------------------------------------------------------
+let startX;
+let currentCard;
+
+function handleTouchStart(event) {
+  startX = event.touches[0].clientX;
+  currentCard = event.currentTarget;
 }
 
-  // Card start
-  let startX;
-  let currentCard;
+function handleTouchMove(event) {
+  if (!startX) return;
+  const currentX = event.touches[0].clientX;
+  const diffX = startX - currentX;
 
-  function handleTouchStart(event) {
-    startX = event.touches[0].clientX;
-    currentCard = event.currentTarget;
+  if (diffX > 0) {
+    currentCard.classList.add("swiped");
+  } else {
+    currentCard.classList.remove("swiped");
   }
+}
 
-  function handleTouchMove(event) {
-    if (!startX) return;
-    const currentX = event.touches[0].clientX;
-    const diffX = startX - currentX;
-
-    if (diffX > 0) {
-      currentCard.classList.add("swiped");
-    } else {
-      currentCard.classList.remove("swiped");
-    }
-  }
-
-  function handleTouchEnd(event) {
-    startX = null;
-    currentCard = null;
-  }
-  // Card end
+function handleTouchEnd(event) {
+  startX = null;
+  currentCard = null;
+}
+// Card end
