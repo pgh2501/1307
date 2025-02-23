@@ -1,6 +1,6 @@
 class MembersController {
-  constructor(supabaseService) {
-    this.supabaseService = supabaseService;
+  constructor() {
+    this.supabaseService = new SupabaseService(SUPABASE_URL, SUPABASE_KEY);
   }
 
   init() {
@@ -10,7 +10,7 @@ class MembersController {
   // Show members
   async showMember() {
     try {
-      const members = await supabaseService.getMembers();
+      const members = await this.supabaseService.getMembers();
       this.setHeaderPopup(members); // Header
       this.setMembersSection(members); // Members Section
       console.log("Show member: ", members);
@@ -103,7 +103,7 @@ class MembersController {
 
     // Thêm thành viên
     try {
-      const members = await supabaseService.addMember(sName, publicUrl);
+      const members = await this.supabaseService.addMember(sName, publicUrl);
       console.log("Đã thêm thành viên: ", members);
     } catch (error) {
       console.error("Error:", error.message);
@@ -124,7 +124,7 @@ class MembersController {
 
     // Cập nhật thành viên
     try {
-      const members = await supabaseService.updateMember(
+      const members = await this.supabaseService.updateMember(
         memberId,
         sName,
         publicUrl
@@ -151,7 +151,7 @@ class MembersController {
   // Delete member
   async removeMember(memberId) {
     try {
-      const member = await supabaseService.deleteMember(memberId);
+      const member = await this.supabaseService.deleteMember(memberId);
 
       console.log("Đã xóa thành viên: ", member);
     } catch (error) {
@@ -169,13 +169,13 @@ class MembersController {
     // Nếu có avatar thì upload
     try {
       const avatarPath = `avatars/${Date.now()}-${fAvatar.name}`;
-      const avatar = await supabaseService.uploadFile(avatarPath, fAvatar);
+      const avatar = await this.supabaseService.uploadFile(avatarPath, fAvatar);
 
       // Thành công
       if (avatar) {
         console.log("Tải lên avatar: ", avatar);
         // Lấy public url của avatar vừa upload
-        const avatarPublicUrl = await supabaseService.getFilePublicUrl(
+        const avatarPublicUrl = await this.supabaseService.getFilePublicUrl(
           avatarPath
         );
 
@@ -195,7 +195,8 @@ class MembersController {
 
   async deleteAvatars(avatarPathForDelete) {
     try {
-      const avatarDeleted = supabaseService.deleteFile(avatarPathForDelete);
+      const avatarDeleted =
+        this.supabaseService.deleteFile(avatarPathForDelete);
       console.log("Đã xóa avatar: ", avatarDeleted);
     } catch (error) {
       console.error("Error:", error.message);

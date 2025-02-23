@@ -5,6 +5,10 @@ body {
     padding: 0;
 }
 
+li {
+    user-select: none;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -58,6 +62,7 @@ header .select-buyer-btn {
     margin-right: 10px;
 }
 
+/* ---------------------------------------------- */
 /* main start */
 main {
     flex: 1;
@@ -72,6 +77,7 @@ section.active {
 
 /* main end */
 
+/* ---------------------------------------------- */
 /* common start */
 .schedule,
 .purchases,
@@ -111,14 +117,21 @@ nav ul {
 
 /* common end*/
 
+/* ---------------------------------------------- */
 /* schedule start */
 .schedule li.current-day {
     background-color: #0984e3;
     color: #fff;
 }
 
+.schedule li.no-member {
+    background-color: #e3b009;
+    color: #fff;
+}
+
 /* schedule end */
 
+/* ---------------------------------------------- */
 /* purchases start */
 .purchases li .details {
     display: none;
@@ -161,6 +174,7 @@ nav ul {
 
 /* purchases end */
 
+/* ---------------------------------------------- */
 /* members start */
 .members button {
     background-color: #00b894;
@@ -183,6 +197,7 @@ nav ul {
 
 /* members end */
 
+/* ---------------------------------------------- */
 /* popup start */
 .popup-form.active {
     display: block;
@@ -235,6 +250,7 @@ nav ul {
 
 /* popup end */
 
+/* ---------------------------------------------- */
 .overlay {
     display: none;
     position: fixed;
@@ -250,6 +266,7 @@ nav ul {
     display: block;
 }
 
+/* ---------------------------------------------- */
 /* nav start */
 nav {
     position: fixed;
@@ -288,6 +305,7 @@ nav i {
 
 /* nav end */
 
+/* ---------------------------------------------- */
 /* card start */
 .card {
     display: flex;
@@ -335,6 +353,7 @@ nav i {
 
 /* card end */
 
+/* ---------------------------------------------- */
 @media (min-width: 769px) {
     section {
         display: block;
@@ -376,5 +395,20 @@ nav i {
 
     .purchases .edit-btn {
         padding: 5px 10px;
+        
     } */
+
+    /* test dragging */
+    /* cursor: grab; Thay đổi con trỏ chuột khi hover */
+    /* user-select: none; Ngăn chặn việc chọn văn bản khi kéo */
+    /* opacity: 0.5; Hiệu ứng mờ khi kéo */
+    /* .schedule li {
+        cursor: grab;
+    }
+
+    .schedule li.dragging {
+        opacity: 0.5;
+    } */
+
+    /* test dragging */
 }

@@ -186,6 +186,28 @@ class SupabaseService {
   }
 
   /**
+   * Truy vấn dữ liệu từ một view trong Supabase.
+   * @param {string} viewName - Tên view cần truy vấn.
+   * @returns {Promise<Array>} - Promise trả về mảng dữ liệu từ view.
+   * @throws {Error} - Ném lỗi nếu truy vấn thất bại.
+   */
+  async getViewData(viewName) {
+    try {
+      const { data, error } = await this.supabase.from(viewName).select("*");
+
+      if (error) {
+        throw new Error(
+          `Failed to fetch data from view ${viewName}: ${error.message}`
+        );
+      }
+      return data;
+    } catch (error) {
+      console.error("Error in getViewData:", error);
+      throw error; // Re-throw the error to be handled by the caller.
+    }
+  }
+
+  /**
    * Upload một file lên Supabase Storage.
    * @param {string} bucket - Tên bucket.
    * @param {string} path - Đường dẫn đến file.
@@ -270,21 +292,9 @@ class SupabaseService {
   //--------------------------------------------------------------------------
 
   //TABLE_SCHEDULE------------------------------------------------------------
-  async getCleaningSchedule() {
-    const { data, error } = await this.supabase
-      .from("CleaningSchedule")
-      .select("id, user_id, day_of_week, Users(name)")
-      .order("id", { ascending: true });
-    if (error) {
-      throw new Error(`Failed to fetch cleaning schedule: ${error.message}`);
-    }
-    const result = data.map((item) => ({
-      id: item.id,
-      user_id: item.user_id,
-      day_of_week: item.day_of_week,
-      name: item.Users.name, // Lấy name từ Users
-    }));
-    return result;
+  async getSchedule() {
+    const data = await this.getViewData("schedule_with_members_name");
+    return data;
   }
   //--------------------------------------------------------------------------
 

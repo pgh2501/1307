@@ -7,16 +7,14 @@ let currentPopup = null;
 let isLoadProductsPurchased = false;
 
 // Khởi tạo services và controllers
-const supabaseService = new SupabaseService(SUPABASE_URL, SUPABASE_KEY);
-
-const membersController = new MembersController(supabaseService);
-const scheduleController = new ScheduleController(supabaseService);
-const expensesController = new ExpensesController(supabaseService);
+const membersController = new MembersController();
+const scheduleController = new ScheduleController();
+const expensesController = new ExpensesController();
 
 // Init--------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   membersController.init();
-  // scheduleController.showCleaningSchedule();
+  scheduleController.init();
   // expensesController.showExpenses();
   showNav();
 });
@@ -175,12 +173,6 @@ async function removeMember(memberId) {
   }
 }
 
-// function removeMember(memberId) {
-//   const returnValue = openForm("messageConfirmPopup");
-//   if (returnValue) {
-//     // membersController.removeMember(memberId);
-//   }
-// }
 // Popup end---------------------------
 function toggleDetails(button) {
   const details = button.nextElementSibling;
