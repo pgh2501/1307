@@ -1,7 +1,14 @@
+const SUPABASE_URL = "https://glaeuevvtsavesqrdhcr.supabase.co";
+const SUPABASE_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsYWV1ZXZ2dHNhdmVzcXJkaGNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5NzkzODcsImV4cCI6MjA1NTU1NTM4N30.01lbnToxXsAbGi6JQmv4HkcDnxIOF_HLcJcYAzHyoh8";
+
 let selectedBuyer = null;
 let currentPopup = null;
 let isLoadProductsPurchased = false;
+
+// Khởi tạo services và controllers
 const supabaseService = new SupabaseService(SUPABASE_URL, SUPABASE_KEY);
+
 const membersController = new MembersController(supabaseService);
 const scheduleController = new ScheduleController(supabaseService);
 const expensesController = new ExpensesController(supabaseService);
