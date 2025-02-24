@@ -15,6 +15,7 @@ class ScheduleController {
 
   init() {
     this.showSchedule();
+    this.setEvent();
   }
 
   async showSchedule() {
@@ -63,5 +64,44 @@ class ScheduleController {
 
     scheduleList.innerHTML = ""; // Xóa danh sách cũ để tránh reflow nhiều lần
     scheduleList.appendChild(fragment);
+  }
+
+  setEvent() {
+    // this.addDraggingEvent();
+  }
+
+  // test dragging
+  addDraggingEvent() {
+    const scheduleList = document.querySelector(".schedule ul");
+    let draggedItem = null;
+
+    // Sự kiện bắt đầu kéo
+    scheduleList.addEventListener("dragstart", (event) => {
+      draggedItem = event.target;
+      draggedItem.classList.add("dragging");
+    });
+
+    // Sự kiện kéo qua
+    scheduleList.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      const afterElement = getDragAfterElement(scheduleList, event.clientY);
+      if (afterElement == null) {
+        scheduleList.appendChild(draggedItem);
+      } else {
+        scheduleList.insertBefore(draggedItem, afterElement);
+      }
+    });
+
+    // Sự kiện kết thúc kéo
+    scheduleList.addEventListener("dragend", () => {
+      draggedItem.classList.remove("dragging");
+      draggedItem = null;
+    });
+
+    // Thêm thuộc tính draggable cho các thẻ li
+    const listItems = scheduleList.querySelectorAll("li");
+    listItems.forEach((item) => {
+      item.setAttribute("draggable", true);
+    });
   }
 }

@@ -220,6 +220,26 @@ function showNav() {
   navItems[0].classList.add("active");
   document.getElementById("schedule").classList.add("active");
 }
+
+// test dragging
+// function getDragAfterElement(scheduleList, y) {
+//   const draggableElements = [
+//     ...scheduleList.querySelectorAll("li:not(.dragging)"),
+//   ];
+
+//   return draggableElements.reduce(
+//     (closest, child) => {
+//       const box = child.getBoundingClientRect();
+//       const offset = y - box.top - box.height / 2;
+//       if (offset < 0 && offset > closest.offset) {
+//         return { offset: offset, element: child };
+//       } else {
+//         return closest;
+//       }
+//     },
+//     { offset: Number.NEGATIVE_INFINITY }
+//   ).element;
+// }
 // Event end
 // Card start--------------------------------------------------------------------
 let startX;

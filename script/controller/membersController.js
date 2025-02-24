@@ -4,8 +4,8 @@ class MembersController {
   }
 
   init() {
-    this.setEvent();
     this.showMember();
+    this.setEvent();
   }
   // Show members
   async showMember() {
@@ -20,12 +20,14 @@ class MembersController {
   }
 
   setEvent() {
+    // click avatar in header
     document
       .getElementById("memberAvatarPreview")
       .addEventListener("click", function () {
         document.getElementById("memberAvatar").click();
       });
 
+    // change avatar
     document
       .getElementById("memberAvatar")
       .addEventListener("change", function (event) {
@@ -50,10 +52,13 @@ class MembersController {
       return;
     }
     membersList.innerHTML = members
+      .filter((member) => member.id !== 0)
       .map(
         (member) => `
-      <li>
-        <button onclick="selectHeaderMember({name: '${member.name}', image: '${member.image_url}'})">${member.name}</button>
+        <li>
+          <button onclick="selectHeaderMember({name: '${member.name}', image: '${member.image_url}'})">
+            ${member.name}
+          </button>
         </li>
       `
       )
@@ -87,9 +92,19 @@ class MembersController {
           ontouchstart="handleTouchStart(event)" 
           ontouchmove="handleTouchMove(event)" 
           ontouchend="handleTouchEnd(event)">
-        <span onclick="openFormUpdateMember('addMemberPopup', {id: '${member.id}', name: '${member.name}', image: '${member.image_url}'})" 
-          class="card-content">${member.name}</span>
-        <div onclick="removeMember(${member.id})" class="card-remove">Remove</div>
+        <span onclick="openFormUpdateMember('addMemberPopup', { id: '${
+          member.id
+        }', name: '${member.name}', image: '${
+          member.image_url
+        }'})" class="card-content">
+          ${member.name}
+        </span>
+        <img class="card-image" alt="User profile picture" src="${
+          member.image_url || "assets/avatarDefault.png"
+        }" />
+        <div onclick="removeMember(${member.id})" class="card-remove">
+            Remove
+        </div>
       </li>
     `
       )
