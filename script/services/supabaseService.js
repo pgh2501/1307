@@ -299,6 +299,15 @@ class SupabaseService {
   //--------------------------------------------------------------------------
 
   //TABLE_EXPENSES------------------------------------------------------------
+  async getExpenses() {
+    const expenses = await this.select(
+      SupabaseService.TABLE_EXPENSES,
+      {},
+      "*, members(name)"
+    );
+    return expenses;
+  }
+
   async addProductPurchase(userId, productName, price, purchaseDate) {
     const { data, error } = await this.supabase
       .from("ProductsPurchased")

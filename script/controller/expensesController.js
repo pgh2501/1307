@@ -1,52 +1,79 @@
 class ExpensesController {
-  constructor(supabaseService) {
-    this.supabaseService = supabaseService;
+  constructor() {
+    this.supabaseService = new SupabaseService(SUPABASE_URL, SUPABASE_KEY);
+  }
+
+  init() {
+    this.showExpenses();
   }
 
   async showExpenses() {
     try {
-      const purchases = await supabaseService.getProductsPurchased();
-      console.log("ProductsPurchased:", purchases);
-      this.renderPurchases(purchases);
+      const expenses = await this.supabaseService.getExpenses();
+      console.log("Show expenses:", expenses);
+      this.displayExpenses(expenses);
     } catch (error) {
       console.error("Error:", error.message);
     }
   }
 
-  renderPurchases(purchases) {
+  displayExpenses(expenses) {
     const ul = document.querySelector(".purchases ul");
     ul.innerHTML = "";
 
-    const groupedPurchases = purchases.reduce((acc, purchase) => {
-      if (!acc[purchase.buyer]) {
-        acc[purchase.buyer] = { total: 0, items: [] };
+    if (!Array.isArray(expenses) || expenses.length === 0) {
+      // Xử lý trường hợp expenses không hợp lệ hoặc rỗng
+      ul.innerHTML = "<li>Không có chi tiêu nào.</li>";
+      return;
+    }
+
+    const groupedExpenses = expenses.reduce((group, expense) => {
+      const memberId = expense.member_id;
+      if (!group[memberId]) {
+        group[memberId] = { total: 0, items: [], name: expense.members.name };
       }
-      acc[purchase.buyer].total += purchase.price;
-      acc[purchase.buyer].items.push(purchase);
-      return acc;
+      group[memberId].total += expense.price;
+      group[memberId].items.push(expense);
+      return group;
     }, {});
 
-    for (const buyer in groupedPurchases) {
+    for (const id in groupedExpenses) {
+      const memberExpenses = groupedExpenses[id];
       const li = document.createElement("li");
+
       li.innerHTML = `
-                <span>${buyer}</span>
-                <span>Total Price: $${groupedPurchases[buyer].total}</span>
-                <button class="details-btn" onclick="toggleDetails(this)">Chi Tiết</button>
-                <div class="details">
-                  ${groupedPurchases[buyer].items
-                    .map(
-                      (item) => `
-                      <div class="details-item">
-                      <p>Product Name: ${item.product}</p>
-                      <p>Price: $${item.price}</p>
-                      <p>Purchase Date: ${item.date}</p>
-                      <button class="edit-btn">Edit</button>
-                      </div>
-                  `
-                    )
-                    .join("")}
+        <div class="overview">
+          <div class="contents">
+            <span>${memberExpenses.name}</span>
+            <span>Tổng cộng: ${memberExpenses.total.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}</span>
+          </div>
+          <button class="details-btn" onclick="toggleDetails(this)">Chi Tiết</button>
+        </div>
+        <div class="details">
+          ${memberExpenses.items
+            .map(
+              (item) => `
+                <div class="details-item">
+                  <div class="contents">
+                    <p>Tên sản phẩm: ${item.item_name}</p>
+                    <p>Ngày mua: ${new Date(
+                      item.purchase_date
+                    ).toLocaleDateString("vi-VN")}</p>
+                    <p>Giá: ${item.price.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}</p>
+                  </div>
                 </div>
-          `;
+              `
+            )
+            .join("")}
+        </div>
+      `;
+
       ul.appendChild(li);
     }
   }

@@ -2,7 +2,7 @@ const SUPABASE_URL = "https://glaeuevvtsavesqrdhcr.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsYWV1ZXZ2dHNhdmVzcXJkaGNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk5NzkzODcsImV4cCI6MjA1NTU1NTM4N30.01lbnToxXsAbGi6JQmv4HkcDnxIOF_HLcJcYAzHyoh8";
 
-let selectedBuyer = null;
+let currentMember = null;
 let currentPopup = null;
 let isLoadProductsPurchased = false;
 
@@ -15,7 +15,7 @@ const expensesController = new ExpensesController();
 document.addEventListener("DOMContentLoaded", () => {
   membersController.init();
   scheduleController.init();
-  // expensesController.showExpenses();
+  expensesController.init();
   showNav();
 });
 // Init end
@@ -23,6 +23,25 @@ document.addEventListener("DOMContentLoaded", () => {
 // Event start--------------------------------------------------------------------
 // Popup start---------------------------
 function openForm(popupId) {
+  if (popupId === "addExpensePopup") {
+    // Gán select member
+    if (currentMember) {
+      const selectElement = document.getElementById("expensesId");
+      const optionToSelect = selectElement.querySelector(
+        `option[value="${currentMember.id}"]`
+      );
+      if (optionToSelect) {
+        optionToSelect.selected = true;
+      }
+    }
+
+    // Gán ngày hiện tại
+    const expensesPurchaseDate = document.getElementById(
+      "expensesPurchaseDate"
+    );
+    expensesPurchaseDate.value = getInputTypeDateDefaultValue();
+  }
+
   currentPopup = document.getElementById(popupId);
   currentPopup.classList.add("active");
   document.querySelector(".overlay").classList.add("active");
@@ -113,23 +132,21 @@ function openFormUpdateMember(popupId, member) {
   openForm(popupId);
 }
 
-function selectHeaderMember(buyer) {
+function selectHeaderMember(member) {
   const selectBuyerBtn = document.querySelector(".select-buyer-btn");
   const profileImg = document.querySelector(".profile img");
-
-  selectedBuyer = buyer;
-
-  if (buyer.image) {
-    profileImg.src = buyer.image;
+  currentMember = member;
+  if (member.image) {
+    profileImg.src = member.image;
   } else {
     profileImg.src = "assets/avatarDefault.png";
   }
-  selectBuyerBtn.textContent = buyer.name;
+  selectBuyerBtn.textContent = member.name;
 
   closeForm();
 }
 
-function addProduct(event) {
+function addExpense(event) {
   event.preventDefault();
   const buyer = document.querySelector("#buyer").value;
   const product = document.querySelector("#product").value;
@@ -173,15 +190,21 @@ async function removeMember(memberId) {
   }
 }
 
+function getInputTypeDateDefaultValue() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // Thêm 1 vì tháng bắt đầu từ 0
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 // Popup end---------------------------
 function toggleDetails(button) {
-  const details = button.nextElementSibling;
-  if (details.style.display === "none" || details.style.display === "") {
-    details.style.display = "block";
+  const details = button.parentElement.nextElementSibling;
+  details.classList.toggle("show");
+  if (details.classList.contains("show")) {
     button.textContent = "Ẩn";
   } else {
-    details.style.display = "none";
-    button.textContent = "Chi Tiết";
+    button.textContent = "Chi tiết";
   }
 }
 

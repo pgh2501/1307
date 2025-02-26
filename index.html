@@ -40,7 +40,7 @@
                 <div class="purchases">
                     <h2>Chi tiêu</h2>
                     <ul></ul>
-                    <button class="add-btn" onclick="openForm('addProductPopup')">Thêm</button>
+                    <button class="add-btn" onclick="openForm('addExpensePopup')">Thêm</button>
                 </div>
             </section>
             <section id="money">
@@ -88,12 +88,13 @@
         <ul></ul>
         <button class="close-btn" onclick="closeForm()" type="button">Đóng</button>
     </div>
-    <div id="addProductPopup" class="popup-form">
-        <form onsubmit="addProduct(event)">
-            <input id="buyer" placeholder="Mày là ai?" required="" type="text" />
-            <input id="product" placeholder="Mua gì?" required="" type="text" />
-            <input id="price" placeholder="Nhiêu?" required="" type="number" />
-            <input id="date" placeholder="Hồi nàooo?" required="" type="date" />
+    <div id="addExpensePopup" class="popup-form">
+        <form onsubmit="addExpense(event)">
+            <input type="text" id="expensesItemName" name="expensesItemName" placeholder="Mua gì?" required />
+            <input type="number" id="expensesPrice" name="expensesPrice" placeholder="Nhiêu?" min="0" required />
+            <select id="expensesId" name="expensesId" title="M là ai???"></select>
+            <input type="date" id="expensesPurchaseDate" name="expensesPurchaseDate" placeholder="Hồi nàooo?"
+                required />
             <button type="submit">Thêm</button>
             <button class="close-btn" onclick="closeForm()" type="button">Đóng</button>
         </form>

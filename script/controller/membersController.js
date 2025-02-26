@@ -11,6 +11,7 @@ class MembersController {
   async showMember() {
     try {
       const members = await this.supabaseService.getMembers();
+      this.setSelectOptionsExpensePopup(members); // Add Expense Popup
       this.setHeaderPopup(members); // Header
       this.setMembersSection(members); // Members Section
       console.log("Show member: ", members);
@@ -56,13 +57,25 @@ class MembersController {
       .map(
         (member) => `
         <li>
-          <button onclick="selectHeaderMember({name: '${member.name}', image: '${member.image_url}'})">
+          <button onclick="selectHeaderMember({id: '${member.id}', name: '${member.name}', image: '${member.image_url}'})">
             ${member.name}
           </button>
         </li>
       `
       )
       .join("");
+  }
+
+  setSelectOptionsExpensePopup(members) {
+    const selectElement = document.getElementById("expensesId");
+    members.forEach((item) => {
+      if (item.id !== 0) {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = item.name;
+        selectElement.appendChild(option);
+      }
+    });
   }
 
   setMembersSection(members) {

@@ -134,17 +134,35 @@ nav ul {
 
 /* ---------------------------------------------- */
 /* purchases start */
+.purchases li {
+    display: block;
+}
+
+.purchases li .overview {
+    display: flex;
+    justify-content: space-between;
+}
+
+.purchases li .overview .contents {
+    display: flex;
+    flex-direction: column;
+}
+
+.purchases li .overview .contents :first-child {
+    font-weight: bold;
+}
+
 .purchases li .details {
-    display: none;
     margin-top: 10px;
 }
 
 .purchases li .details .details-item {
     background-color: #ceebe5;
-    border: none;
     padding: 10px 20px;
     border-radius: 5px;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .purchases li .details p {
@@ -169,8 +187,28 @@ nav ul {
     width: 100%;
 }
 
-.purchases .edit-btn {
-    background-color: #00b894;
+.purchases li .details {
+    display: none;
+}
+
+.purchases li .details.show {
+    display: block;
+}
+
+.purchases li .overview>* {
+    margin-right: 10px;
+}
+
+.purchases li .overview>*:last-child {
+    margin-right: 0;
+}
+
+.purchases li .details .details-item>* {
+    margin-bottom: 5px;
+}
+
+purchases li .details .details-item>*:last-child {
+    margin-bottom: 0;
 }
 
 /* purchases end */
@@ -219,7 +257,8 @@ nav ul {
 }
 
 .popup-form input,
-.popup-form button {
+.popup-form button,
+.popup-form select {
     display: block;
     width: 100%;
     margin-bottom: 10px;
@@ -385,34 +424,10 @@ nav i {
         display: none;
     }
 
-    .schedule li,
-    .purchases li {
+    .schedule li {
         flex-direction: column;
         align-items: flex-start;
     }
-
-    .purchases li .details-btn {
-        margin-top: 10px;
-    }
-
-    .header .select-buyer-btn {
-        width: 100%;
-        text-align: left;
-    }
-
-    .purchases li .details {
-        width: 100%;
-    }
-
-    /* test */
-    /* .purchases li>button.details-btn {
-        padding: 5px 10px;
-    }
-
-    .purchases .edit-btn {
-        padding: 5px 10px;
-        
-    } */
 
     /* test dragging */
     /* cursor: grab; Thay đổi con trỏ chuột khi hover */
