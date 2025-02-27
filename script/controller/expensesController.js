@@ -56,7 +56,13 @@ class ExpensesController {
           ${memberExpenses.items
             .map(
               (item) => `
-                <div class="details-item">
+                <div class="details-item" ondblclick="editExpense({ id: ${
+                  item.id
+                }, member_id: ${item.member_id}, item_name: '${
+                item.item_name
+              }', price: ${item.price}, purchase_date: '${
+                item.purchase_date
+              }'})" >
                   <div class="contents">
                     <p>Tên sản phẩm: ${item.item_name}</p>
                     <p>Ngày mua: ${new Date(
@@ -73,8 +79,25 @@ class ExpensesController {
             .join("")}
         </div>
       `;
-
       ul.appendChild(li);
     }
+  }
+
+  // Add Expenses
+  async addExpense(itemName, price, memberId, purchaseDate) {
+    try {
+      const expense = await this.supabaseService.addExpense(
+        itemName,
+        price,
+        memberId,
+        purchaseDate
+      );
+      console.log("Đã thêm chi tiêu: ", expense);
+    } catch (error) {
+      console.error("Error:", error.message);
+      return;
+    }
+    // Sau khi thêm, hiển thị lại danh sách chi tiêu
+    this.showExpenses();
   }
 }

@@ -26,7 +26,7 @@ function openForm(popupId) {
   if (popupId === "addExpensePopup") {
     // Gán select member
     if (currentMember) {
-      const selectElement = document.getElementById("expensesId");
+      const selectElement = document.getElementById("expensesMemberId");
       const optionToSelect = selectElement.querySelector(
         `option[value="${currentMember.id}"]`
       );
@@ -148,14 +148,26 @@ function selectHeaderMember(member) {
 
 function addExpense(event) {
   event.preventDefault();
-  const buyer = document.querySelector("#buyer").value;
-  const product = document.querySelector("#product").value;
-  const price = parseFloat(document.querySelector("#price").value);
-  const date = document.querySelector("#date").value;
+  const form = document.getElementById("addExpenseForm");
+  const formData = new FormData(form);
 
-  purchases.push({ buyer, product, price, date });
-  renderPurchases();
+  // Get input
+  const itemName = formData.get("expensesItemName");
+  const price = formData.get("expensesPrice");
+  const memberId = formData.get("expensesMemberId");
+  const purchaseDate = formData.get("expensesPurchaseDate");
+
+  expensesController.addExpense(itemName, price, memberId, purchaseDate);
   closeForm();
+}
+
+function editExpense(expense) {
+  document.getElementById("expensesItemName").value = expense.item_name;
+  document.getElementById("expensesPrice").value = expense.price;
+  document.getElementById("expensesMemberId").value = expense.member_id;
+  document.getElementById("expensesPurchaseDate").value = expense.purchase_date;
+
+  openForm("addExpensePopup");
 }
 
 function upsertMember(event) {
@@ -183,7 +195,7 @@ function upsertMember(event) {
 }
 
 async function removeMember(memberId) {
-  const confirmed = await showMessageConfirm("M chắc chưa?");
+  const confirmed = await showMessageConfirm("Chắc xóa chưa?");
   if (confirmed) {
     // Xử lý xóa thành viên
     membersController.removeMember(memberId);

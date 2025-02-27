@@ -308,21 +308,14 @@ class SupabaseService {
     return expenses;
   }
 
-  async addProductPurchase(userId, productName, price, purchaseDate) {
-    const { data, error } = await this.supabase
-      .from("ProductsPurchased")
-      .insert([
-        {
-          user_id: userId,
-          product_name: productName,
-          price,
-          purchase_date: purchaseDate,
-        },
-      ]);
-    if (error) {
-      throw new Error(`Failed to add product purchase: ${error.message}`);
-    }
-    return data;
+  async addExpense(itemName, price, memberId, purchaseDate) {
+    const member = this.insert(SupabaseService.TABLE_EXPENSES, {
+      item_name: itemName,
+      price: price,
+      member_id: memberId,
+      purchase_date: purchaseDate,
+    });
+    return member;
   }
 
   async getProductsPurchased() {

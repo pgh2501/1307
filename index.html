@@ -3,11 +3,21 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Điều kì diệu ở phòng giam số 1307</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet" />
-    <link href="styles.css" rel="stylesheet" />
+
+    <link rel="icon" type="image/png" sizes="96x96" href="assets/favicon/favicon-96x96.png" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="assets/favicon/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="1307" />
+    <link rel="manifest" href="assets/favicon/site.webmanifest" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" />
+    <link rel="stylesheet" href="styles.css" />
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
 </head>
 
@@ -89,10 +99,10 @@
         <button class="close-btn" onclick="closeForm()" type="button">Đóng</button>
     </div>
     <div id="addExpensePopup" class="popup-form">
-        <form onsubmit="addExpense(event)">
+        <form onsubmit="addExpense(event)" id="addExpenseForm">
             <input type="text" id="expensesItemName" name="expensesItemName" placeholder="Mua gì?" required />
             <input type="number" id="expensesPrice" name="expensesPrice" placeholder="Nhiêu?" min="0" required />
-            <select id="expensesId" name="expensesId" title="M là ai???"></select>
+            <select id="expensesMemberId" name="expensesMemberId" title="M là ai???"></select>
             <input type="date" id="expensesPurchaseDate" name="expensesPurchaseDate" placeholder="Hồi nàooo?"
                 required />
             <button type="submit">Thêm</button>

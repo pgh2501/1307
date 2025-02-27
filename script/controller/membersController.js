@@ -67,7 +67,7 @@ class MembersController {
   }
 
   setSelectOptionsExpensePopup(members) {
-    const selectElement = document.getElementById("expensesId");
+    const selectElement = document.getElementById("expensesMemberId");
     members.forEach((item) => {
       if (item.id !== 0) {
         const option = document.createElement("option");
@@ -102,14 +102,13 @@ class MembersController {
       .map(
         (member) => `
       <li class="card" 
+          ondblclick="openFormUpdateMember('addMemberPopup', { id: '${
+            member.id
+          }', name: '${member.name}', image: '${member.image_url}'})"
           ontouchstart="handleTouchStart(event)" 
           ontouchmove="handleTouchMove(event)" 
           ontouchend="handleTouchEnd(event)">
-        <span onclick="openFormUpdateMember('addMemberPopup', { id: '${
-          member.id
-        }', name: '${member.name}', image: '${
-          member.image_url
-        }'})" class="card-content">
+        <span class="card-content">
           ${member.name}
         </span>
         <img class="card-image" alt="User profile picture" src="${

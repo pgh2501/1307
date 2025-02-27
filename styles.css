@@ -163,6 +163,14 @@ nav ul {
     margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+.purchases li .details .details-item:hover {
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    opacity: 0.8;
+    background-color: #5aa899;
 }
 
 .purchases li .details p {
