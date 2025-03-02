@@ -102,9 +102,9 @@ class MembersController {
       .map(
         (member) => `
       <li class="card" 
-          ondblclick="openFormUpdateMember('addMemberPopup', { id: '${
-            member.id
-          }', name: '${member.name}', image: '${member.image_url}'})"
+          ondblclick="openFormUpdateMember({ id: '${member.id}', name: '${
+          member.name
+        }', image: '${member.image_url}'})"
           ontouchstart="handleTouchStart(event)" 
           ontouchmove="handleTouchMove(event)" 
           ontouchend="handleTouchEnd(event)">

@@ -80,13 +80,15 @@ section.active {
 /* ---------------------------------------------- */
 /* common start */
 .schedule,
-.purchases,
+.expenses,
+.rent,
 .members {
     margin-top: 20px;
 }
 
 .schedule h2,
-.purchases h2,
+.expenses h2,
+.rent h2,
 .members h2 {
     font-size: 24px;
     font-weight: 700;
@@ -95,7 +97,8 @@ section.active {
 
 .popup-form ul,
 .schedule ul,
-.purchases ul,
+.expenses ul,
+.rent ul,
 .members ul,
 nav ul {
     list-style: none;
@@ -103,7 +106,7 @@ nav ul {
 }
 
 .schedule li,
-.purchases li,
+.expenses li,
 .members li {
     background-color: #fff;
     border-radius: 10px;
@@ -113,6 +116,23 @@ nav ul {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.add-btn {
+    /* hình dạng button */
+    padding: 0;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border: none;
+    /* vị trí button */
+    position: fixed;
+    bottom: 12%;
+    right: 5%;
+    background-color: #e3b009;
+    color: white;
+    cursor: pointer;
+    z-index: 11;
 }
 
 /* common end*/
@@ -133,30 +153,30 @@ nav ul {
 /* schedule end */
 
 /* ---------------------------------------------- */
-/* purchases start */
-.purchases li {
+/* expenses start */
+.expenses li {
     display: block;
 }
 
-.purchases li .overview {
+.expenses li .overview {
     display: flex;
     justify-content: space-between;
 }
 
-.purchases li .overview .contents {
+.expenses li .overview .contents {
     display: flex;
     flex-direction: column;
 }
 
-.purchases li .overview .contents :first-child {
+.expenses li .overview .contents :first-child {
     font-weight: bold;
 }
 
-.purchases li .details {
+.expenses li .details {
     margin-top: 10px;
 }
 
-.purchases li .details .details-item {
+.expenses li .details .details-item {
     background-color: #ceebe5;
     padding: 10px 20px;
     border-radius: 5px;
@@ -166,80 +186,153 @@ nav ul {
     transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
 }
 
-.purchases li .details .details-item:hover {
+.expenses li .details .details-item:hover {
     transform: scale(0.95);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     opacity: 0.8;
     background-color: #5aa899;
 }
 
-.purchases li .details p {
+.expenses li .details .details-item i {
+    color: #d63031;
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.expenses li .details .details-item i:hover {
+    color: #6e2525;
+}
+
+.expenses li .details p {
     margin: 5px 0;
 }
 
-.purchases button {
+.expenses li .details-btn {
     color: #fff;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
-}
-
-.purchases li .details-btn {
     background-color: #0984e3;
 }
 
-.purchases .add-btn {
-    background-color: #00b894;
-    margin-bottom: 20px;
-    width: 100%;
-}
-
-.purchases li .details {
+.expenses li .details {
     display: none;
 }
 
-.purchases li .details.show {
+.expenses li .details.show {
     display: block;
 }
 
-.purchases li .overview>* {
+.expenses li .overview>* {
     margin-right: 10px;
 }
 
-.purchases li .overview>*:last-child {
+.expenses li .overview>*:last-child {
     margin-right: 0;
 }
 
-.purchases li .details .details-item>* {
+.expenses li .details .details-item>* {
     margin-bottom: 5px;
 }
 
-purchases li .details .details-item>*:last-child {
+.expenses li .details .details-item>*:last-child {
     margin-bottom: 0;
 }
 
-/* purchases end */
+/* expenses end */
 
 /* ---------------------------------------------- */
-/* members start */
-.members button {
-    background-color: #00b894;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 20px;
+/* rent start */
+.rent-select,
+.rent-fields,
+.rent-members {
+    margin-bottom: 16px;
 }
 
-.members .add-btn {
-    background-color: #00b894;
+.rent-select label,
+.rent-fields label,
+.rent-members label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.rent-select select,
+.rent-fields input,
+.rent-members input {
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
     width: 100%;
 }
 
-.members .remove-btn {
-    background-color: #d63031;
+.rent-fields,
+.rent-members-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+/* rent-select */
+
+/* rent-fields */
+.rent-fields {
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.rent-fields .field.otherFee {
+    grid-column: span 2 / span 2;
+}
+
+.rent-fields .field.otherFee input {
+    width: calc(50% - 4px);
+}
+
+.rent-fields .field.otherFee input:last-child {
+    margin-left: 4px;
+}
+
+/* field item */
+.rent-select select,
+.rent-fields .field,
+.rent-member-item {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+}
+
+.rent-fields .field {
+    background-color: #a3cbe9;
+}
+
+.rent-member-item {
+    display: flex;
+    flex-direction: column;
+    row-gap: 8px;
+    background-color: #ceebe5;
+}
+
+/* rent-members-item */
+.rent-member-item-details {
+    display: none;
+    width: 50%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ceebe5;
+    padding: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    z-index: 1000;
+}
+
+.rent-member-item-details.active {
+    display: block;
 }
 
 /* members end */
@@ -436,18 +529,4 @@ nav i {
         flex-direction: column;
         align-items: flex-start;
     }
-
-    /* test dragging */
-    /* cursor: grab; Thay đổi con trỏ chuột khi hover */
-    /* user-select: none; Ngăn chặn việc chọn văn bản khi kéo */
-    /* opacity: 0.5; Hiệu ứng mờ khi kéo */
-    /* .schedule li {
-        cursor: grab;
-    }
-
-    .schedule li.dragging {
-        opacity: 0.5;
-    } */
-
-    /* test dragging */
 }

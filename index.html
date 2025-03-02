@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-title" content="1307" />
     <link rel="manifest" href="assets/favicon/site.webmanifest" />
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@latest/css/all.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" />
     <link rel="stylesheet" href="styles.css" />
 
@@ -46,24 +46,115 @@
                     </ul>
                 </div>
             </section>
-            <section id="purchases">
-                <div class="purchases">
+            <section id="expenses">
+                <div class="expenses">
                     <h2>Chi tiêu</h2>
                     <ul></ul>
-                    <button class="add-btn" onclick="openForm('addExpensePopup')">Thêm</button>
+                    <button class="add-btn" onclick="openForm('addExpensePopup')">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
             </section>
-            <section id="money">
-                <div class="purchases">
-                    <h2>Cho con Dương xài</h2>
-                    <ul></ul>
+            <section id="rent">
+                <div class="rent">
+                    <h2>Tính tiền</h2>
+                    <form id="rentForm">
+                        <div class="rent-select">
+                            <!-- <label for="rentMonthYear">Tiền nhà tháng</label> -->
+                            <select name="rentMonthYear" id="rentMonthYear">
+                                <option value="">Chọn tháng tính tiền nhà</option>
+                                <optgroup value="2025" label="2025">
+                                    <option value="1" label="1"></option>
+                                    <option value="2" label="2"></option>
+                                </optgroup>
+                                <optgroup value="2024" label="2024">
+                                    <option value="1" label="1"></option>
+                                    <option value="2" label="2"></option>
+                                    <option value="3" label="3"></option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <h3>Phí chung</h3>
+                        <div class="rent-fields">
+                            <div class="field house">
+                                <label for="rentHouse">Tiền thuê nhà</label>
+                                <input type="number" name="rentHouse" id="rentHouse" placeholder="Tiền thuê nhà">
+                            </div>
+                            <div class="field electricity">
+                                <label for="rentElectricity">Tiền điện</label>
+                                <input type="number" name="rentElectricity" id="rentElectricity"
+                                    placeholder="Tiền điện">
+                            </div>
+                            <div class="field water">
+                                <label for="rentWater">Tiền nước</label>
+                                <input type="number" name="rentWater" id="rentWater" placeholder="Tiền nước">
+                            </div>
+                            <div class="field managementFee">
+                                <label for="rentManagementFee">Phí quản lý</label>
+                                <input type="number" name="rentManagementFee" id="rentManagementFee"
+                                    placeholder="Phí quản lý">
+                            </div>
+                            <div class="field otherFee">
+                                <label for="rentOtherFee">Phí khác</label>
+                                <input type="number" name="rentOtherFee" id="rentOtherFee" placeholder="Phí khác">
+                                <input type="text" name="rentOtherFeeNote" id="rentOtherFeeNote" placeholder="Ghi chú">
+                            </div>
+                        </div>
+                        <h3>Phí riêng</h3>
+                        <div class="rent-members">
+                            <ul class="rent-members-list" id="rent-members-list">
+                                <li id="test1" class="rent-member-item" data-member-id="1">
+                                    <span>Tên 1</span>
+                                    <span>Tổng cộng: 100000 đ</span>
+                                    <div id="test2" class="rent-member-item-details">
+                                        <label>Giu xe: <input type="number" name="rentMemberParking-1"
+                                                value="50000"></label>
+                                        <label>Khác: <input type="number" name="otherPersonalFee-1"
+                                                value="50000"></label>
+                                    </div>
+                                </li>
+                                <li id="test1" class="rent-member-item" data-member-id="1">
+                                    <span>Tên 1</span>
+                                    <div id="test2" class="rent-member-item-details">
+                                        <label>Giu xe: <input type="number" name="rentMemberParking-1"
+                                                value="50000"></label>
+                                        <label>Khác: <input type="number" name="otherPersonalFee-1"
+                                                value="50000"></label>
+                                    </div>
+                                </li>
+                                <li id="test1" class="rent-member-item" data-member-id="1">
+                                    <span>Tên 1</span>
+                                    <div id="test2" class="rent-member-item-details">
+                                        <label>Giu xe: <input type="number" name="rentMemberParking-1"
+                                                value="50000"></label>
+                                        <label>Khác: <input type="number" name="otherPersonalFee-1"
+                                                value="50000"></label>
+                                    </div>
+                                </li>
+                                <li id="test1" class="rent-member-item" data-member-id="1">
+                                    <span>Tên 1</span>
+                                    <div id="test2" class="rent-member-item-details">
+                                        <label>Giu xe: <input type="number" name="rentMemberParking-1"
+                                                value="50000"></label>
+                                        <label>Khác: <input type="number" name="otherPersonalFee-1"
+                                                value="50000"></label>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <button class="add-btn" type="submit">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </form>
                 </div>
             </section>
             <section id="members">
                 <div class="members">
                     <h2>Người trong gian nhà</h2>
                     <ul></ul>
-                    <button class="add-btn" onclick="openForm('addMemberPopup')">Thêm</button>
+                    <button class="add-btn" onclick="openForm('addMemberPopup')">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
             </section>
         </main>
@@ -76,12 +167,12 @@
                 </a>
             </li>
             <li>
-                <a href="#purchases" class="nav-item">
+                <a href="#expenses" class="nav-item">
                     <i class="fas fa-credit-card"></i>
                 </a>
             </li>
             <li>
-                <a href="#money" class="nav-item">
+                <a href="#rent" class="nav-item">
                     <i class="fas fa-dollar-sign"></i>
                 </a>
             </li>
@@ -99,12 +190,13 @@
         <button class="close-btn" onclick="closeForm()" type="button">Đóng</button>
     </div>
     <div id="addExpensePopup" class="popup-form">
-        <form onsubmit="addExpense(event)" id="addExpenseForm">
+        <form onsubmit="upsertExpense(event)" id="upsertExpenseForm">
             <input type="text" id="expensesItemName" name="expensesItemName" placeholder="Mua gì?" required />
             <input type="number" id="expensesPrice" name="expensesPrice" placeholder="Nhiêu?" min="0" required />
             <select id="expensesMemberId" name="expensesMemberId" title="M là ai???"></select>
             <input type="date" id="expensesPurchaseDate" name="expensesPurchaseDate" placeholder="Hồi nàooo?"
                 required />
+            <input type="hidden" id="expensesId" name="expensesId">
             <button type="submit">Thêm</button>
             <button class="close-btn" onclick="closeForm()" type="button">Đóng</button>
         </form>
@@ -114,9 +206,9 @@
             <input type="text" id="memberName" name="memberName" placeholder="Tên" required>
             <img src="assets/avatarDefault.png" alt=" " id="memberAvatarPreview">
             <input type="file" id="memberAvatar" name="memberAvatar" accept="image/*" style="display: none;">
-            <input type="hidden" id="memberId" name="memberId" value="0">
+            <input type="hidden" id="memberId" name="memberId">
             <input type="hidden" id="memberOldImageUrl" name="memberOldImageUrl">
-            <button type="submit" id="memberBtnSubmit">Thêm</button>
+            <button type="submit">Thêm</button>
             <button class="close-btn" onclick="closeForm()" type="button">Đóng</button>
         </form>
     </div>

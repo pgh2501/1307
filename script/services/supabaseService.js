@@ -268,23 +268,23 @@ class SupabaseService {
     return member;
   }
 
-  async updateMember(iMemberId, sName, sImageUrl) {
+  async updateMember(id, sName, sImageUrl) {
     let updateData = { name: sName };
     if (sImageUrl) {
       updateData.image_url = sImageUrl;
     }
     const data = this.update(
       SupabaseService.TABLE_MEMBERS,
-      { id: iMemberId },
+      { id: id },
       updateData
     );
     return data;
   }
 
-  async deleteMember(iMemberId) {
+  async deleteMember(id) {
     const data = this.update(
       SupabaseService.TABLE_MEMBERS,
-      { id: iMemberId },
+      { id: id },
       { active: false }
     );
     return data;
@@ -308,30 +308,37 @@ class SupabaseService {
     return expenses;
   }
 
+  async getExpensesByMemberId(memberId) {
+    const expenses = await this.select(
+      SupabaseService.TABLE_EXPENSES,
+      { member_id: memberId },
+      "*, members(name)"
+    );
+    return expenses;
+  }
+
   async addExpense(itemName, price, memberId, purchaseDate) {
-    const member = this.insert(SupabaseService.TABLE_EXPENSES, {
+    const expense = this.insert(SupabaseService.TABLE_EXPENSES, {
       item_name: itemName,
       price: price,
       member_id: memberId,
       purchase_date: purchaseDate,
     });
-    return member;
+    return expense;
   }
 
-  async getProductsPurchased() {
-    const { data, error } = await this.supabase
-      .from("ProductsPurchased")
-      .select("*, Users(name)");
-    if (error) {
-      throw new Error(`Failed to fetch purchased products: ${error.message}`);
-    }
-    const result = data.map((item) => ({
-      buyer: item.Users.name, // Lấy name từ Users
-      product: item.product_name,
-      price: item.price,
-      date: item.purchase_date,
-    }));
-    return result;
+  async updateExpense(id, itemName, price, memberId, purchaseDate) {
+    const expense = this.update(
+      SupabaseService.TABLE_EXPENSES,
+      { id: id },
+      {
+        item_name: itemName,
+        price: price,
+        member_id: memberId,
+        purchase_date: purchaseDate,
+      }
+    );
+    return expense;
   }
   //--------------------------------------------------------------------------
 

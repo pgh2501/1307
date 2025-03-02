@@ -17,12 +17,23 @@ class ExpensesController {
     }
   }
 
+  async reload(memberId) {
+    try {
+      const expensesOfMember = await this.supabaseService.getExpensesByMemberId(
+        memberId
+      );
+      console.log("Reload expenses:", expensesOfMember);
+      this.displayExpenseOfMember(expensesOfMember);
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
+  }
+
   displayExpenses(expenses) {
-    const ul = document.querySelector(".purchases ul");
+    const ul = document.querySelector(".expenses ul");
     ul.innerHTML = "";
 
     if (!Array.isArray(expenses) || expenses.length === 0) {
-      // Xử lý trường hợp expenses không hợp lệ hoặc rỗng
       ul.innerHTML = "<li>Không có chi tiêu nào.</li>";
       return;
     }
@@ -40,6 +51,7 @@ class ExpensesController {
     for (const id in groupedExpenses) {
       const memberExpenses = groupedExpenses[id];
       const li = document.createElement("li");
+      li.setAttribute("data-member-id", id);
 
       li.innerHTML = `
         <div class="overview">
@@ -53,37 +65,91 @@ class ExpensesController {
           <button class="details-btn" onclick="toggleDetails(this)">Chi Tiết</button>
         </div>
         <div class="details">
-          ${memberExpenses.items
-            .map(
-              (item) => `
-                <div class="details-item" ondblclick="editExpense({ id: ${
-                  item.id
-                }, member_id: ${item.member_id}, item_name: '${
-                item.item_name
-              }', price: ${item.price}, purchase_date: '${
-                item.purchase_date
-              }'})" >
-                  <div class="contents">
-                    <p>Tên sản phẩm: ${item.item_name}</p>
-                    <p>Ngày mua: ${new Date(
-                      item.purchase_date
-                    ).toLocaleDateString("vi-VN")}</p>
-                    <p>Giá: ${item.price.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}</p>
-                  </div>
-                </div>
-              `
-            )
-            .join("")}
+          ${memberExpenses.items.map(this.createExpenseItemHTML).join("")}
         </div>
       `;
+
       ul.appendChild(li);
     }
   }
 
-  // Add Expenses
+  displayExpenseOfMember(expensesOfMember) {
+    console.log("expensesOfMember", expensesOfMember);
+
+    const ul = document.querySelector(".expenses ul");
+
+    if (!Array.isArray(expensesOfMember) || expensesOfMember.length === 0) {
+      return;
+    }
+
+    const memberId = expensesOfMember[0].member_id;
+    const memberName = expensesOfMember[0].members.name;
+    const total = expensesOfMember.reduce(
+      (sum, expense) => sum + expense.price,
+      0
+    );
+
+    let li = ul.querySelector(`li[data-member-id="${memberId}"]`);
+
+    if (!li) {
+      li = document.createElement("li");
+      li.setAttribute("data-member-id", memberId);
+      ul.appendChild(li);
+
+      li.innerHTML = `
+        <div class="overview">
+          <div class="contents">
+            <span>${memberName}</span>
+            <span>Tổng cộng: ${total.toLocaleString("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            })}</span>
+          </div>
+          <button class="details-btn" onclick="toggleDetails(this)">Chi Tiết</button>
+        </div>
+        <div class="details">
+          ${expensesOfMember.map(this.createExpenseItemHTML).join("")}
+        </div>
+      `;
+      return;
+    }
+
+    const totalSpan = li.querySelector(".overview .contents span:last-child");
+    totalSpan.textContent = `Tổng cộng: ${total.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    })}`;
+
+    const detailsDiv = li.querySelector(".details");
+    detailsDiv.innerHTML = expensesOfMember
+      .map(this.createExpenseItemHTML)
+      .join("");
+  }
+
+  createExpenseItemHTML(item) {
+    return `
+      <div class="details-item" data-expense-id="${
+        item.id
+      }" ondblclick="openFormUpdateExpense({ id: ${item.id}, member_id: ${
+      item.member_id
+    }, item_name: '${item.item_name}', price: ${item.price}, purchase_date: '${
+      item.purchase_date
+    }'})">
+        <div class="contents">
+          <p>Tên sản phẩm: ${item.item_name}</p>
+          <p>Ngày mua: ${new Date(item.purchase_date).toLocaleDateString(
+            "vi-VN"
+          )}</p>
+          <p>Giá: ${item.price.toLocaleString("vi-VN", {
+            style: "currency",
+            currency: "VND",
+          })}</p>
+        </div>
+        <i class="fa-solid fa-trash" onclick="removeExpense(${item.id})"></i>
+      </div>
+    `;
+  }
+
   async addExpense(itemName, price, memberId, purchaseDate) {
     try {
       const expense = await this.supabaseService.addExpense(
@@ -93,11 +159,30 @@ class ExpensesController {
         purchaseDate
       );
       console.log("Đã thêm chi tiêu: ", expense);
+      // Sau khi thêm, hiển thị lại danh sách chi tiêu
+      await this.reload(memberId);
     } catch (error) {
       console.error("Error:", error.message);
       return;
     }
-    // Sau khi thêm, hiển thị lại danh sách chi tiêu
-    this.showExpenses();
+  }
+
+  // Update Expenses
+  async updateExpense(id, itemName, price, memberId, purchaseDate) {
+    try {
+      const expense = await this.supabaseService.updateExpense(
+        id,
+        itemName,
+        price,
+        memberId,
+        purchaseDate
+      );
+      console.log("Đã cập nhật chi tiêu: ", expense);
+      // Sau khi cập nhật, hiển thị lại danh sách chi tiêu
+      await this.reload(memberId);
+    } catch (error) {
+      console.error("Error:", error.message);
+      return;
+    }
   }
 }

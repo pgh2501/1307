@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Event start--------------------------------------------------------------------
 // Popup start---------------------------
-function openForm(popupId) {
+function openForm(popupId, edit) {
   if (popupId === "addExpensePopup") {
     // Gán select member
     if (currentMember) {
@@ -39,18 +39,34 @@ function openForm(popupId) {
     const expensesPurchaseDate = document.getElementById(
       "expensesPurchaseDate"
     );
-    expensesPurchaseDate.value = getInputTypeDateDefaultValue();
+    if (!expensesPurchaseDate.value) {
+      expensesPurchaseDate.value = getInputTypeDateDefaultValue();
+    }
   }
 
   currentPopup = document.getElementById(popupId);
+  const submitButton = currentPopup.querySelector("button[type='submit']");
+
+  // Hiển thị tên button
+  if (submitButton) {
+    if (edit) {
+      submitButton.textContent = "Cập nhật";
+    } else {
+      submitButton.textContent = "Thêm";
+    }
+  }
+  // Hiển thị popup
   currentPopup.classList.add("active");
+  // Active orverlay
   document.querySelector(".overlay").classList.add("active");
 }
 
 function closeForm() {
-  currentPopup.classList.remove("active");
+  if (currentPopup) {
+    currentPopup.classList.remove("active");
+    resetForm(currentPopup);
+  }
   document.querySelector(".overlay").classList.remove("active");
-  resetForm(currentPopup);
 }
 
 function resetForm(currentPopup) {
@@ -60,7 +76,7 @@ function resetForm(currentPopup) {
       // Reset các input text, number, date, email, v.v.
       form
         .querySelectorAll(
-          'input[type="text"], input[type="number"], input[type="date"], input[type="email"]'
+          'input[type="text"], input[type="number"], input[type="date"], input[type="email"], input[type="hidden"]'
         )
         .forEach((input) => {
           input.value = "";
@@ -78,11 +94,6 @@ function resetForm(currentPopup) {
         if (avatarPreview) {
           avatarPreview.src = "assets/avatarDefault.png";
         }
-
-        // Đặt lại memberId
-        form.querySelectorAll('input[type="hidden"]').forEach((input) => {
-          input.value = 0;
-        });
       }
     }
   }
@@ -94,6 +105,7 @@ function showMessageConfirm(message) {
     const confirmMessage = document.getElementById("confirmMessage");
     const confirmYes = document.getElementById("confirmYes");
     const confirmNo = document.getElementById("confirmNo");
+    const overlay = document.querySelector(".overlay");
 
     confirmMessage.textContent = message;
 
@@ -107,8 +119,13 @@ function showMessageConfirm(message) {
       closeConfirmPopup();
     };
 
+    overlay.onclick = () => {
+      resolve(false);
+      closeConfirmPopup();
+    };
+
     confirmPopup.classList.add("active");
-    document.querySelector(".overlay").classList.add("active");
+    overlay.classList.add("active");
 
     function closeConfirmPopup() {
       confirmPopup.classList.remove("active");
@@ -117,19 +134,6 @@ function showMessageConfirm(message) {
       confirmNo.onclick = null;
     }
   });
-}
-
-function openFormUpdateMember(popupId, member) {
-  // Hiển thị thông tin member
-  if (member) {
-    document.getElementById("memberId").value = member.id;
-    document.getElementById("memberOldImageUrl").value = member.image;
-    document.getElementById("memberName").value = member.name;
-    document.getElementById("memberAvatarPreview").src =
-      member.image || "assets/avatarDefault.png";
-    document.getElementById("memberBtnSubmit").textContent = "Lưu";
-  }
-  openForm(popupId);
 }
 
 function selectHeaderMember(member) {
@@ -146,9 +150,10 @@ function selectHeaderMember(member) {
   closeForm();
 }
 
-function addExpense(event) {
+// Expense start---------------------------
+function upsertExpense(event) {
   event.preventDefault();
-  const form = document.getElementById("addExpenseForm");
+  const form = document.getElementById("upsertExpenseForm");
   const formData = new FormData(form);
 
   // Get input
@@ -156,20 +161,42 @@ function addExpense(event) {
   const price = formData.get("expensesPrice");
   const memberId = formData.get("expensesMemberId");
   const purchaseDate = formData.get("expensesPurchaseDate");
+  const id = formData.get("expensesId");
 
-  expensesController.addExpense(itemName, price, memberId, purchaseDate);
+  if (id) {
+    expensesController.updateExpense(
+      id,
+      itemName,
+      price,
+      memberId,
+      purchaseDate
+    );
+  } else {
+    expensesController.addExpense(itemName, price, memberId, purchaseDate);
+  }
   closeForm();
 }
 
-function editExpense(expense) {
+function openFormUpdateExpense(expense) {
   document.getElementById("expensesItemName").value = expense.item_name;
   document.getElementById("expensesPrice").value = expense.price;
   document.getElementById("expensesMemberId").value = expense.member_id;
   document.getElementById("expensesPurchaseDate").value = expense.purchase_date;
+  document.getElementById("expensesId").value = expense.id;
 
-  openForm("addExpensePopup");
+  openForm("addExpensePopup", true);
 }
 
+async function removeExpense(id) {
+  const confirmed = await showMessageConfirm("Chắc chưa bro?");
+  if (confirmed) {
+    // Xử lý xóa chi tiêu
+    console.log("Delete: ", id);
+    // membersController.removeMember(id);
+  }
+}
+
+// Member start---------------------------
 function upsertMember(event) {
   event.preventDefault();
   const form = document.getElementById("upsertMemberForm");
@@ -180,9 +207,7 @@ function upsertMember(event) {
   const memberAvatar = formData.get("memberAvatar");
   const memberId = formData.get("memberId");
 
-  if (parseInt(memberId) === 0) {
-    membersController.addMember(memberName.trim(), memberAvatar);
-  } else {
+  if (memberId) {
     const memberOldImageUrl = formData.get("memberOldImageUrl");
     membersController.updateMember(
       memberId,
@@ -190,8 +215,22 @@ function upsertMember(event) {
       memberAvatar,
       memberOldImageUrl
     );
+  } else {
+    membersController.addMember(memberName.trim(), memberAvatar);
   }
   closeForm();
+}
+
+function openFormUpdateMember(member) {
+  // Hiển thị thông tin member
+  if (member) {
+    document.getElementById("memberId").value = member.id;
+    document.getElementById("memberOldImageUrl").value = member.image;
+    document.getElementById("memberName").value = member.name;
+    document.getElementById("memberAvatarPreview").src =
+      member.image || "assets/avatarDefault.png";
+  }
+  openForm("addMemberPopup", true);
 }
 
 async function removeMember(memberId) {
@@ -255,26 +294,6 @@ function showNav() {
   navItems[0].classList.add("active");
   document.getElementById("schedule").classList.add("active");
 }
-
-// test dragging
-// function getDragAfterElement(scheduleList, y) {
-//   const draggableElements = [
-//     ...scheduleList.querySelectorAll("li:not(.dragging)"),
-//   ];
-
-//   return draggableElements.reduce(
-//     (closest, child) => {
-//       const box = child.getBoundingClientRect();
-//       const offset = y - box.top - box.height / 2;
-//       if (offset < 0 && offset > closest.offset) {
-//         return { offset: offset, element: child };
-//       } else {
-//         return closest;
-//       }
-//     },
-//     { offset: Number.NEGATIVE_INFINITY }
-//   ).element;
-// }
 // Event end
 // Card start--------------------------------------------------------------------
 let startX;
@@ -302,3 +321,9 @@ function handleTouchEnd(event) {
   currentCard = null;
 }
 // Card end
+
+const element = document.getElementById("test1");
+
+element.addEventListener("click", function (event) {
+  openForm("test2");
+});
