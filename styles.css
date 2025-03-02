@@ -125,14 +125,31 @@ nav ul {
     width: 50px;
     border-radius: 50%;
     border: none;
-    /* vị trí button */
-    position: fixed;
-    bottom: 12%;
-    right: 5%;
     background-color: #e3b009;
     color: white;
     cursor: pointer;
-    z-index: 11;
+}
+
+/* Tooltip ở footer */
+.tooltip-footer {
+    position: fixed;
+    top: 4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #e3b009;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+.tooltip-footer.active {
+    opacity: 1;
 }
 
 /* common end*/
@@ -309,11 +326,20 @@ nav ul {
     background-color: #a3cbe9;
 }
 
+.rent-fields .field label {
+    font-weight: bold;
+}
+
+
 .rent-member-item {
     display: flex;
     flex-direction: column;
     row-gap: 8px;
     background-color: #ceebe5;
+}
+
+.rent-member-item :first-child {
+    font-weight: bold;
 }
 
 /* rent-members-item */
@@ -528,5 +554,12 @@ nav i {
     .schedule li {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .add-btn {
+        position: fixed;
+        bottom: 12%;
+        right: 5%;
+        z-index: 11;
     }
 }

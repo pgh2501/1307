@@ -60,7 +60,6 @@
                     <h2>Tính tiền</h2>
                     <form id="rentForm">
                         <div class="rent-select">
-                            <!-- <label for="rentMonthYear">Tiền nhà tháng</label> -->
                             <select name="rentMonthYear" id="rentMonthYear">
                                 <option value="">Chọn tháng tính tiền nhà</option>
                                 <optgroup value="2025" label="2025">
@@ -80,6 +79,11 @@
                                 <label for="rentHouse">Tiền thuê nhà</label>
                                 <input type="number" name="rentHouse" id="rentHouse" placeholder="Tiền thuê nhà">
                             </div>
+                            <div class="field managementFee">
+                                <label for="rentManagementFee">Phí quản lý</label>
+                                <input type="number" name="rentManagementFee" id="rentManagementFee"
+                                    placeholder="Phí quản lý">
+                            </div>
                             <div class="field electricity">
                                 <label for="rentElectricity">Tiền điện</label>
                                 <input type="number" name="rentElectricity" id="rentElectricity"
@@ -89,11 +93,6 @@
                                 <label for="rentWater">Tiền nước</label>
                                 <input type="number" name="rentWater" id="rentWater" placeholder="Tiền nước">
                             </div>
-                            <div class="field managementFee">
-                                <label for="rentManagementFee">Phí quản lý</label>
-                                <input type="number" name="rentManagementFee" id="rentManagementFee"
-                                    placeholder="Phí quản lý">
-                            </div>
                             <div class="field otherFee">
                                 <label for="rentOtherFee">Phí khác</label>
                                 <input type="number" name="rentOtherFee" id="rentOtherFee" placeholder="Phí khác">
@@ -102,44 +101,7 @@
                         </div>
                         <h3>Phí riêng</h3>
                         <div class="rent-members">
-                            <ul class="rent-members-list" id="rent-members-list">
-                                <li id="test1" class="rent-member-item" data-member-id="1">
-                                    <span>Tên 1</span>
-                                    <span>Tổng cộng: 100000 đ</span>
-                                    <div id="test2" class="rent-member-item-details">
-                                        <label>Giu xe: <input type="number" name="rentMemberParking-1"
-                                                value="50000"></label>
-                                        <label>Khác: <input type="number" name="otherPersonalFee-1"
-                                                value="50000"></label>
-                                    </div>
-                                </li>
-                                <li id="test1" class="rent-member-item" data-member-id="1">
-                                    <span>Tên 1</span>
-                                    <div id="test2" class="rent-member-item-details">
-                                        <label>Giu xe: <input type="number" name="rentMemberParking-1"
-                                                value="50000"></label>
-                                        <label>Khác: <input type="number" name="otherPersonalFee-1"
-                                                value="50000"></label>
-                                    </div>
-                                </li>
-                                <li id="test1" class="rent-member-item" data-member-id="1">
-                                    <span>Tên 1</span>
-                                    <div id="test2" class="rent-member-item-details">
-                                        <label>Giu xe: <input type="number" name="rentMemberParking-1"
-                                                value="50000"></label>
-                                        <label>Khác: <input type="number" name="otherPersonalFee-1"
-                                                value="50000"></label>
-                                    </div>
-                                </li>
-                                <li id="test1" class="rent-member-item" data-member-id="1">
-                                    <span>Tên 1</span>
-                                    <div id="test2" class="rent-member-item-details">
-                                        <label>Giu xe: <input type="number" name="rentMemberParking-1"
-                                                value="50000"></label>
-                                        <label>Khác: <input type="number" name="otherPersonalFee-1"
-                                                value="50000"></label>
-                                    </div>
-                                </li>
+                            <ul class="rent-members-list">
                             </ul>
                         </div>
                         <button class="add-btn" type="submit">
@@ -204,6 +166,10 @@
     <div id="addMemberPopup" class="popup-form">
         <form onsubmit="upsertMember(event)" id="upsertMemberForm">
             <input type="text" id="memberName" name="memberName" placeholder="Tên" required>
+            <input type="number" name="memberDefaultParkingFee" id="memberDefaultParkingFee"
+                placeholder="Phí giữ xe mặc định" data-tooltip="Phí giữ xe. Không có xe thì khỏi nhập">
+            <input type="number" name="memberDefaultOtherFee" id="memberDefaultOtherFee" placeholder="Phí mặc định khác"
+                data-tooltip="Phí khác. Không có thì thoi">
             <img src="assets/avatarDefault.png" alt=" " id="memberAvatarPreview">
             <input type="file" id="memberAvatar" name="memberAvatar" accept="image/*" style="display: none;">
             <input type="hidden" id="memberId" name="memberId">
@@ -217,6 +183,7 @@
         <button id="confirmYes">Có</button>
         <button id="confirmNo" class="close-btn">Không</button>
     </div>
+    <div class="tooltip-footer" id="tooltip"></div>
     <script src="script/services/supabaseService.js"></script>
     <script src="script/controller/membersController.js"></script>
     <script src="script/controller/scheduleController.js"></script>

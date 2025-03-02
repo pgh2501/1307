@@ -11,9 +11,10 @@ class MembersController {
   async showMember() {
     try {
       const members = await this.supabaseService.getMembers();
-      this.setSelectOptionsExpensePopup(members); // Add Expense Popup
       this.setHeaderPopup(members); // Header
       this.setMembersSection(members); // Members Section
+      expensesController.setSelectOptions(members); // Add Expense Popup
+      rentController.displayRentMembers(members); // Rent fucntion
       console.log("Show member: ", members);
     } catch (error) {
       console.error("Error:", error.message);
@@ -66,18 +67,6 @@ class MembersController {
       .join("");
   }
 
-  setSelectOptionsExpensePopup(members) {
-    const selectElement = document.getElementById("expensesMemberId");
-    members.forEach((item) => {
-      if (item.id !== 0) {
-        const option = document.createElement("option");
-        option.value = item.id;
-        option.textContent = item.name;
-        selectElement.appendChild(option);
-      }
-    });
-  }
-
   setMembersSection(members) {
     const membersList = document.querySelector("#members ul");
 
@@ -104,7 +93,9 @@ class MembersController {
       <li class="card" 
           ondblclick="openFormUpdateMember({ id: '${member.id}', name: '${
           member.name
-        }', image: '${member.image_url}'})"
+        }', image: '${member.image_url}', default_parking_fee: '${
+          member.default_parking_fee
+        }', default_other_fee: '${member.default_other_fee}'})"
           ontouchstart="handleTouchStart(event)" 
           ontouchmove="handleTouchMove(event)" 
           ontouchend="handleTouchEnd(event)">
@@ -124,13 +115,23 @@ class MembersController {
   }
 
   // Add members
-  async addMember(sName, fAvatar) {
+  async addMember(
+    sName,
+    memberDefaultParkingFee,
+    memberDefaultOtherFee,
+    fAvatar
+  ) {
     // Upload avatar
     const { publicUrl, avatarPath } = await this.uploadAvatar(fAvatar);
 
     // Thêm thành viên
     try {
-      const members = await this.supabaseService.addMember(sName, publicUrl);
+      const members = await this.supabaseService.addMember(
+        sName,
+        memberDefaultParkingFee,
+        memberDefaultOtherFee,
+        publicUrl
+      );
       console.log("Đã thêm thành viên: ", members);
     } catch (error) {
       console.error("Error:", error.message);
@@ -145,7 +146,14 @@ class MembersController {
   }
 
   // Update member
-  async updateMember(memberId, sName, fAvatar, oldImageUrl) {
+  async updateMember(
+    memberId,
+    sName,
+    defaultParkingFee,
+    defaultOtherFee,
+    fAvatar,
+    oldImageUrl
+  ) {
     // Upload avatar mới
     const { publicUrl, avatarPath } = await this.uploadAvatar(fAvatar);
 
@@ -154,6 +162,8 @@ class MembersController {
       const members = await this.supabaseService.updateMember(
         memberId,
         sName,
+        defaultParkingFee,
+        defaultOtherFee,
         publicUrl
       );
       console.log("Đã cập nhật thành viên: ", members);

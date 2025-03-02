@@ -17,6 +17,18 @@ class ExpensesController {
     }
   }
 
+  setSelectOptions(members) {
+    const selectElement = document.getElementById("expensesMemberId");
+    members.forEach((item) => {
+      if (item.id !== 0) {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = item.name;
+        selectElement.appendChild(option);
+      }
+    });
+  }
+
   async reload(memberId) {
     try {
       const expensesOfMember = await this.supabaseService.getExpensesByMemberId(
@@ -128,14 +140,12 @@ class ExpensesController {
 
   createExpenseItemHTML(item) {
     return `
-      <div class="details-item" data-expense-id="${
-        item.id
-      }" ondblclick="openFormUpdateExpense({ id: ${item.id}, member_id: ${
-      item.member_id
-    }, item_name: '${item.item_name}', price: ${item.price}, purchase_date: '${
-      item.purchase_date
-    }'})">
-        <div class="contents">
+      <div class="details-item" data-expense-id="${item.id}">
+        <div class="contents" onclick="openFormUpdateExpense({ id: ${
+          item.id
+        }, member_id: ${item.member_id}, item_name: '${
+      item.item_name
+    }', price: ${item.price}, purchase_date: '${item.purchase_date}'})">
           <p>Tên sản phẩm: ${item.item_name}</p>
           <p>Ngày mua: ${new Date(item.purchase_date).toLocaleDateString(
             "vi-VN"
@@ -180,6 +190,18 @@ class ExpensesController {
       console.log("Đã cập nhật chi tiêu: ", expense);
       // Sau khi cập nhật, hiển thị lại danh sách chi tiêu
       await this.reload(memberId);
+    } catch (error) {
+      console.error("Error:", error.message);
+      return;
+    }
+  }
+
+  async removeExpense(id) {
+    try {
+      const expense = await this.supabaseService.deleteExpense(id);
+      console.log("Đã xóa chi tiêu: ", expense);
+      // Sau khi xóa, hiển thị lại danh sách chi tiêu
+      await this.reload(expense[0].member_id);
     } catch (error) {
       console.error("Error:", error.message);
       return;

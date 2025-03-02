@@ -10,12 +10,14 @@ let isLoadProductsPurchased = false;
 const membersController = new MembersController();
 const scheduleController = new ScheduleController();
 const expensesController = new ExpensesController();
+const rentController = new RentController();
 
 // Init--------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
   membersController.init();
   scheduleController.init();
   expensesController.init();
+  rentController.init();
   showNav();
 });
 // Init end
@@ -59,6 +61,7 @@ function openForm(popupId, edit) {
   currentPopup.classList.add("active");
   // Active orverlay
   document.querySelector(".overlay").classList.add("active");
+  console.log(currentPopup);
 }
 
 function closeForm() {
@@ -101,7 +104,7 @@ function resetForm(currentPopup) {
 
 function showMessageConfirm(message) {
   return new Promise((resolve) => {
-    const confirmPopup = document.getElementById("messageConfirmPopup");
+    currentPopup = document.getElementById("messageConfirmPopup");
     const confirmMessage = document.getElementById("confirmMessage");
     const confirmYes = document.getElementById("confirmYes");
     const confirmNo = document.getElementById("confirmNo");
@@ -124,11 +127,11 @@ function showMessageConfirm(message) {
       closeConfirmPopup();
     };
 
-    confirmPopup.classList.add("active");
+    currentPopup.classList.add("active");
     overlay.classList.add("active");
 
     function closeConfirmPopup() {
-      confirmPopup.classList.remove("active");
+      currentPopup.classList.remove("active");
       document.querySelector(".overlay").classList.remove("active");
       confirmYes.onclick = null;
       confirmNo.onclick = null;
@@ -191,8 +194,7 @@ async function removeExpense(id) {
   const confirmed = await showMessageConfirm("Chắc chưa bro?");
   if (confirmed) {
     // Xử lý xóa chi tiêu
-    console.log("Delete: ", id);
-    // membersController.removeMember(id);
+    expensesController.removeExpense(id);
   }
 }
 
@@ -204,6 +206,8 @@ function upsertMember(event) {
 
   // Get input
   const memberName = formData.get("memberName");
+  const memberDefaultParkingFee = formData.get("memberDefaultParkingFee");
+  const memberDefaultOtherFee = formData.get("memberDefaultOtherFee");
   const memberAvatar = formData.get("memberAvatar");
   const memberId = formData.get("memberId");
 
@@ -212,11 +216,18 @@ function upsertMember(event) {
     membersController.updateMember(
       memberId,
       memberName.trim(),
+      memberDefaultParkingFee,
+      memberDefaultOtherFee,
       memberAvatar,
       memberOldImageUrl
     );
   } else {
-    membersController.addMember(memberName.trim(), memberAvatar);
+    membersController.addMember(
+      memberName.trim(),
+      memberDefaultParkingFee,
+      memberDefaultOtherFee,
+      memberAvatar
+    );
   }
   closeForm();
 }
@@ -227,6 +238,10 @@ function openFormUpdateMember(member) {
     document.getElementById("memberId").value = member.id;
     document.getElementById("memberOldImageUrl").value = member.image;
     document.getElementById("memberName").value = member.name;
+    document.getElementById("memberDefaultParkingFee").value =
+      member.default_parking_fee;
+    document.getElementById("memberDefaultOtherFee").value =
+      member.default_other_fee;
     document.getElementById("memberAvatarPreview").src =
       member.image || "assets/avatarDefault.png";
   }
@@ -322,8 +337,16 @@ function handleTouchEnd(event) {
 }
 // Card end
 
-const element = document.getElementById("test1");
+// Tooltip start--------------------------------------------------------------------
+const tooltip = document.getElementById("tooltip");
+document.addEventListener("focusin", (event) => {
+  const target = event.target;
+  if (target.matches("input[data-tooltip]")) {
+    tooltip.textContent = target.getAttribute("data-tooltip");
+    tooltip.classList.add("active");
+  }
+});
 
-element.addEventListener("click", function (event) {
-  openForm("test2");
+document.addEventListener("focusout", () => {
+  tooltip.classList.remove("active");
 });

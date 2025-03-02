@@ -260,18 +260,39 @@ class SupabaseService {
     return members;
   }
 
-  async addMember(sName, sImageUrl) {
-    const member = this.insert(SupabaseService.TABLE_MEMBERS, {
+  async addMember(sName, defaultParkingFee, defaultOtherFee, sImageUrl) {
+    let insertData = {
       name: sName,
-      image_url: sImageUrl,
-    });
+    };
+    if (sImageUrl) {
+      updateData.image_url = sImageUrl;
+    }
+    if (defaultParkingFee) {
+      updateData.default_parking_fee = defaultParkingFee;
+    }
+    if (defaultOtherFee) {
+      updateData.default_other_fee = defaultOtherFee;
+    }
+    const member = this.insert(SupabaseService.TABLE_MEMBERS, insertData);
     return member;
   }
 
-  async updateMember(id, sName, sImageUrl) {
-    let updateData = { name: sName };
+  async updateMember(id, sName, defaultParkingFee, defaultOtherFee, sImageUrl) {
+    let updateData = {
+      name: sName,
+    };
     if (sImageUrl) {
       updateData.image_url = sImageUrl;
+    }
+    if (defaultParkingFee) {
+      updateData.default_parking_fee = defaultParkingFee;
+    } else {
+      updateData.default_parking_fee = 0;
+    }
+    if (defaultOtherFee) {
+      updateData.default_other_fee = defaultOtherFee;
+    } else {
+      updateData.default_other_fee = 0;
     }
     const data = this.update(
       SupabaseService.TABLE_MEMBERS,
@@ -303,7 +324,8 @@ class SupabaseService {
     const expenses = await this.select(
       SupabaseService.TABLE_EXPENSES,
       {},
-      "*, members(name)"
+      "*, members(name)",
+      "member_id"
     );
     return expenses;
   }
@@ -338,6 +360,11 @@ class SupabaseService {
         purchase_date: purchaseDate,
       }
     );
+    return expense;
+  }
+
+  async deleteExpense(id) {
+    const expense = this.delete(SupabaseService.TABLE_EXPENSES, { id: id });
     return expense;
   }
   //--------------------------------------------------------------------------
