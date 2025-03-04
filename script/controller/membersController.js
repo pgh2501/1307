@@ -89,29 +89,54 @@ class MembersController {
 
     membersList.innerHTML = sortedMembers
       .map(
-        (member) => `
-      <li class="card" 
-          ondblclick="openFormUpdateMember({ id: '${member.id}', name: '${
-          member.name
-        }', image: '${member.image_url}', default_parking_fee: '${
-          member.default_parking_fee
-        }', default_other_fee: '${member.default_other_fee}'})"
-          ontouchstart="handleTouchStart(event)" 
-          ontouchmove="handleTouchMove(event)" 
-          ontouchend="handleTouchEnd(event)">
-        <span class="card-content">
-          ${member.name}
-        </span>
-        <img class="card-image" alt="User profile picture" src="${
-          member.image_url || "assets/avatarDefault.png"
-        }" />
-        <div onclick="removeMember(${member.id})" class="card-remove">
-            Remove
-        </div>
-      </li>
-    `
+        ({ id, name, image_url, default_parking_fee, default_other_fee }) => `
+    <li class="card"
+        data-id="${id}"
+        data-name="${name}"
+        data-image="${image_url}"
+        data-default-parking-fee="${default_parking_fee}"
+        data-default-other-fee="${default_other_fee}"
+        ontouchstart="handleTouchStart(event)" 
+        ontouchmove="handleTouchMove(event)" 
+        ontouchend="handleTouchEnd(event)">
+      <span class="card-content">
+        ${name}
+      </span>
+      <img class="card-image" alt="User profile picture" src="${
+        image_url || "assets/avatarDefault.png"
+      }" />
+      <div onclick="removeMember(${id})" class="card-remove">
+        Remove
+      </div>
+    </li>
+  `
       )
       .join("");
+
+    document.querySelectorAll(".card").forEach((card) => {
+      card.addEventListener("click", this.handleCardClick);
+    });
+  }
+
+  handleCardClick(event) {
+    const target = event.target;
+    const card = this;
+    if (
+      target.classList.contains("card-image") ||
+      target.classList.contains("card-remove")
+    ) {
+      return;
+    }
+
+    const member = {
+      id: card.dataset.id,
+      name: card.dataset.name,
+      image: card.dataset.image,
+      default_parking_fee: card.dataset["defaultParkingFee"],
+      default_other_fee: card.dataset["defaultOtherFee"],
+    };
+
+    openFormUpdateMember(member);
   }
 
   // Add members

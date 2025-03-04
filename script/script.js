@@ -61,7 +61,6 @@ function openForm(popupId, edit) {
   currentPopup.classList.add("active");
   // Active orverlay
   document.querySelector(".overlay").classList.add("active");
-  console.log(currentPopup);
 }
 
 function closeForm() {

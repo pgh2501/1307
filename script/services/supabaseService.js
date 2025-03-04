@@ -265,13 +265,13 @@ class SupabaseService {
       name: sName,
     };
     if (sImageUrl) {
-      updateData.image_url = sImageUrl;
+      insertData.image_url = sImageUrl;
     }
     if (defaultParkingFee) {
-      updateData.default_parking_fee = defaultParkingFee;
+      insertData.default_parking_fee = defaultParkingFee;
     }
     if (defaultOtherFee) {
-      updateData.default_other_fee = defaultOtherFee;
+      insertData.default_other_fee = defaultOtherFee;
     }
     const member = this.insert(SupabaseService.TABLE_MEMBERS, insertData);
     return member;

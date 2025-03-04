@@ -60,10 +60,13 @@ class ExpensesController {
       return group;
     }, {});
 
+    let allExpenses = 0;
     for (const id in groupedExpenses) {
       const memberExpenses = groupedExpenses[id];
+      allExpenses += memberExpenses.total;
       const li = document.createElement("li");
       li.setAttribute("data-member-id", id);
+      li.setAttribute("data-expense-total", memberExpenses.total);
 
       li.innerHTML = `
         <div class="overview">
@@ -83,6 +86,7 @@ class ExpensesController {
 
       ul.appendChild(li);
     }
+    document.getElementById("allExpenses").value = allExpenses;
   }
 
   displayExpenseOfMember(expensesOfMember) {
