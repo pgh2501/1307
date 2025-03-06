@@ -19,6 +19,9 @@
     <link rel="stylesheet" href="styles.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 </head>
 
 <body>
@@ -184,7 +187,9 @@
         <button id="confirmYes">Có</button>
         <button id="confirmNo" class="close-btn">Không</button>
     </div>
+    <div id="reportPopup" class="popup-form"></div>
     <div class="tooltip-footer" id="tooltip"></div>
+    <script src="script/config/font-roboto-base64.js"></script>
     <script src="script/services/supabaseService.js"></script>
     <script src="script/controller/membersController.js"></script>
     <script src="script/controller/scheduleController.js"></script>

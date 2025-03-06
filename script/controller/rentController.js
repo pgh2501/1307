@@ -3,6 +3,7 @@ class RentController {
   static DEFAULT_RENT_MANAGEMENT_FEE = 50000;
   constructor() {
     this.supabaseService = new SupabaseService(SUPABASE_URL, SUPABASE_KEY);
+    this.jsPDF = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : null;
   }
 
   init() {
@@ -64,11 +65,26 @@ class RentController {
 
   setEvent() {
     const rentForm = document.getElementById("rentForm");
-    rentForm.addEventListener("submit", this.submitRent);
+    rentForm.addEventListener("submit", this.submitRent.bind(this));
+  }
+
+  // Hàm làm tròn đến hàng nghìn
+  roundToThousands(number) {
+    return Math.round(number / 1000) * 1000;
+  }
+
+  // Hàm định dạng số thành tiền tệ Việt Nam
+  formatCurrency(number) {
+    return number.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
   }
 
   submitRent(event) {
     event.preventDefault();
+    // Tổng tất cả các phí
+    let totallCosts = 0;
 
     // Lấy giá trị phí chung
     const rentHouse =
@@ -84,7 +100,7 @@ class RentController {
     const allExpenses =
       parseFloat(document.getElementById("allExpenses").value) || 0;
 
-    // Tính toán GeneralCosts
+    // Tính toán Tổng tiền
     const generalCosts =
       rentHouse +
       rentManagementFee +
@@ -93,48 +109,51 @@ class RentController {
       rentOtherFee +
       allExpenses;
 
+    totallCosts += generalCosts;
+
     // Lấy danh sách thành viên
     const memberItems = document.querySelectorAll(".rent-member-item");
     const numMembers = memberItems.length;
 
-    // Tính toán averagCost
+    // Lấy danh sách tiền đã chi cá nhân
+    const expensesMap = new Map();
+    document.querySelectorAll(".expenses li").forEach((item) => {
+      const memberId = item.dataset.memberId;
+      const expenseTotal = parseFloat(item.dataset.expenseTotal) || 0;
+      expensesMap.set(memberId, expenseTotal);
+    });
+
+    // Tính toán Tiền chia đều
     const averageCost = numMembers > 0 ? generalCosts / numMembers : 0;
 
-    // Tính toán personalCosts và định dạng tiền tệ
+    // Tính toán Tiền phải đóng của mỗi thành viên
     const personalCosts = {};
-    let totalPayableCost = 0; // Thêm biến để tích lũy tổng payableCost
+    let totalPayableCost = 0;
 
     memberItems.forEach((item) => {
       const memberName = item.querySelector("span:first-child").textContent;
+
+      // Lấy chi phí riêng
       const rentTotal = parseFloat(item.dataset.rentTotal) || 0;
+      // Tính toán tổng chi phí cá nhân
       const personalCost = averageCost + rentTotal;
 
-      // Lấy personalExpenses từ data-expense-total của li trong expenses
-      const memberId = item.dataset.memberId;
-      const expenseItem = document.querySelector(
-        `.expenses li[data-member-id="${memberId}"]`
-      );
-      const personalExpenses = expenseItem
-        ? parseFloat(expenseItem.dataset.expenseTotal) || 0
-        : 0;
+      totallCosts += rentTotal;
 
-      // Tính payableCost
+      // Lấy tiền đã chi cá nhân
+      const memberId = item.dataset.memberId;
+      const personalExpenses = expensesMap.get(memberId) || 0;
+
+      // Tính Tiền phải đóng cá nhân
       const payableCost = personalCost - personalExpenses;
 
-      // Lưu giá trị trước khi làm tròn
-      const originalCost = payableCost;
-
       // Làm tròn đến hàng nghìn
-      const roundedCost = Math.round(payableCost / 1000) * 1000;
+      const roundedCost = this.roundToThousands(payableCost);
 
       // Định dạng tiền tệ Việt Nam
-      const formattedCost = roundedCost.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      });
+      const formattedCost = this.formatCurrency(roundedCost);
 
       personalCosts[memberName] = {
-        original: originalCost,
         rounded: roundedCost,
         formatted: formattedCost,
         personalCost: personalCost,
@@ -142,33 +161,112 @@ class RentController {
         payableCost: payableCost,
       };
 
-      totalPayableCost += originalCost; // Tích lũy totalPayableCost
+      totalPayableCost += personalCost;
     });
 
     // In ra các giá trị để kiểm tra
-    console.log(
-      "GeneralCosts:",
-      generalCosts.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      })
-    );
-    console.log(
-      "AverageCost:",
-      averageCost.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      })
-    );
+    console.log("TotallCosts:", totallCosts);
+    console.log("GeneralCosts:", generalCosts);
+    console.log("AverageCost:", averageCost);
     console.log("PersonalCosts:", personalCosts);
-    console.log(
-      "Total Payable Cost:",
-      totalPayableCost.toLocaleString("vi-VN", {
-        style: "currency",
-        currency: "VND",
-      })
-    );
+    console.log("Total Payable Cost:", totalPayableCost);
 
+    this.displayReport(personalCosts, totallCosts);
     // Thêm mã xử lý submit form của bạn ở đây
+  }
+
+  displayReport(data, totallCosts) {
+    const container = document.getElementById("reportPopup");
+
+    const table = this.createReportTable(data, totallCosts);
+    container.innerHTML = ""; // Xóa nội dung cũ
+    container.appendChild(table);
+
+    openForm("reportPopup");
+  }
+
+  createReportTable(data, totallCosts) {
+    const table = document.createElement("table");
+    table.classList.add("report-table");
+    table.id = "report";
+
+    const headerRow = table.insertRow();
+
+    const headers = [
+      "Tên",
+      "Tiền đã làm tròn",
+      "Format về vnđ",
+      "Trước khi trừ tiền đã chi",
+      "Đã chi",
+      "Tiền chưa làm tròn",
+    ];
+    headers.forEach((headerText) => {
+      const headerCell = document.createElement("th");
+      headerCell.textContent = headerText;
+      headerCell.classList.add("report-header");
+      headerRow.appendChild(headerCell);
+    });
+
+    for (const member in data) {
+      const rowData = data[member];
+      const dataRow = table.insertRow();
+      const cells = [
+        member,
+        rowData.rounded,
+        rowData.formatted,
+        rowData.personalCost,
+        rowData.personalExpenses,
+        rowData.payableCost,
+      ];
+      cells.forEach((cellText) => {
+        const dataCell = dataRow.insertCell();
+        dataCell.textContent = cellText;
+        dataCell.classList.add("report-cell");
+      });
+    }
+
+    const h1Element = document.createElement("h1");
+    h1Element.textContent = "Test in báo cáo + xuất file pdf";
+
+    const h2Element = document.createElement("h2");
+    h1Element.textContent = "Tổng cộng: " + this.formatCurrency(totallCosts);
+
+    // Tạo nút in
+    const printButton = document.createElement("button");
+    printButton.textContent = "In báo cáo";
+    printButton.classList.add("print-button");
+    printButton.addEventListener("click", this.generatePDF.bind(this));
+
+    // Thêm nút in vào bảng hoặc một phần tử container khác
+    const container = document.createElement("div"); // Tạo một container để chứa bảng và nút in
+    container.appendChild(h1Element);
+    container.appendChild(h2Element);
+    container.appendChild(table);
+    container.appendChild(printButton);
+
+    return container; // Trả về container thay vì table
+  }
+
+  generatePDF() {
+    if (this.jsPDF) {
+      const doc = new this.jsPDF();
+      const elementHTML = document.querySelector("#report");
+
+      doc.addFileToVFS("Roboto-Regular.ttf", robotoBase64);
+      doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+      doc.setFont("Roboto");
+
+      doc.html(elementHTML, {
+        callback: function (doc) {
+          doc.save("report.pdf");
+        },
+        x: 15,
+        y: 15,
+        width: 170,
+        windowWidth: 650,
+      });
+    } else {
+      console.error("jsPDF is not loaded.");
+    }
   }
 }
