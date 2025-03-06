@@ -229,7 +229,7 @@ class RentController {
     h1Element.textContent = "Test in báo cáo + xuất file pdf";
 
     const h2Element = document.createElement("h2");
-    h1Element.textContent = "Tổng cộng: " + this.formatCurrency(totallCosts);
+    h2Element.textContent = "Tổng cộng: " + this.formatCurrency(totallCosts);
 
     // Tạo nút in
     const printButton = document.createElement("button");
