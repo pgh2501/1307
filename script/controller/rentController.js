@@ -56,9 +56,54 @@ class RentController {
           <label>Phí khác: <input type="number" name="otherPersonalFee-${
             member.id
           }" value="${member.default_other_fee}"></label>
+          <button type="button">Cập nhật</button>
         </div>
       `;
 
+        const detailsBtn = li.querySelector("button");
+        detailsBtn.addEventListener("click", function () {
+          // Lấy giá trị từ các input
+          const parkingInput = li.querySelector(
+            `input[name="rentMemberParking-${member.id}"]`
+          );
+          const otherInput = li.querySelector(
+            `input[name="otherPersonalFee-${member.id}"]`
+          );
+          const parkingFee = parseInt(parkingInput.value);
+          const otherFee = parseInt(otherInput.value);
+
+          // Cập nhật giá trị của các input
+          parkingInput.value = parkingFee;
+          otherInput.value = otherFee;
+
+          // Cập nhật total
+          const newTotal = parkingFee + otherFee;
+
+          // Cập nhật data-rent-total
+          li.setAttribute("data-rent-total", newTotal);
+
+          // Cập nhật nội dung hiển thị total
+          const totalSpan = li.querySelectorAll("span")[1]; // Lấy phần tử span thứ hai
+          totalSpan.textContent = `Tổng cộng: ${newTotal.toLocaleString(
+            "vi-VN",
+            {
+              style: "currency",
+              currency: "VND",
+            }
+          )}`;
+          totalSpan.setAttribute("data-rent-total", newTotal);
+
+          // Cập nhật member object (nếu cần)
+          // const memberIndex = members.findIndex((m) => m.id === member.id);
+          // if (memberIndex !== -1) {
+          //   members[memberIndex].default_parking_fee = parkingFee;
+          //   members[memberIndex].default_other_fee = otherFee;
+          // }
+
+          //cập nhật giá trị của biến total để sau này lấy lại được giá trị mới.
+          // member.default_other_fee = otherFee;
+          // member.default_parking_fee = parkingFee;
+        });
         ul.appendChild(li);
       });
   }
@@ -75,7 +120,8 @@ class RentController {
 
   // Hàm định dạng số thành tiền tệ Việt Nam
   formatCurrency(number) {
-    return number.toLocaleString("vi-VN", {
+    const rounded = this.roundToThousands(number);
+    return rounded.toLocaleString("vi-VN", {
       style: "currency",
       currency: "VND",
     });
@@ -147,18 +193,10 @@ class RentController {
       // Tính Tiền phải đóng cá nhân
       const payableCost = personalCost - personalExpenses;
 
-      // Làm tròn đến hàng nghìn
-      const roundedCost = this.roundToThousands(payableCost);
-
-      // Định dạng tiền tệ Việt Nam
-      const formattedCost = this.formatCurrency(roundedCost);
-
       personalCosts[memberName] = {
-        rounded: roundedCost,
-        formatted: formattedCost,
-        personalCost: personalCost,
-        personalExpenses: personalExpenses,
-        payableCost: payableCost,
+        personalCost: this.formatCurrency(personalCost),
+        personalExpenses: this.formatCurrency(personalExpenses),
+        payableCost: this.formatCurrency(payableCost),
       };
 
       totalPayableCost += personalCost;
@@ -192,14 +230,7 @@ class RentController {
 
     const headerRow = table.insertRow();
 
-    const headers = [
-      "Tên",
-      "Tiền đã làm tròn",
-      "Format về vnđ",
-      "Trước khi trừ tiền đã chi",
-      "Đã chi",
-      "Tiền chưa làm tròn",
-    ];
+    const headers = ["Tên", "Chi phí", "Đã chi", "Thu"];
     headers.forEach((headerText) => {
       const headerCell = document.createElement("th");
       headerCell.textContent = headerText;
@@ -212,8 +243,6 @@ class RentController {
       const dataRow = table.insertRow();
       const cells = [
         member,
-        rowData.rounded,
-        rowData.formatted,
         rowData.personalCost,
         rowData.personalExpenses,
         rowData.payableCost,

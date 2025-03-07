@@ -366,6 +366,21 @@ nav ul {
     display: block;
 }
 
+.rent-member-item-details button {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+
+    background-color: #0984e3;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
 /* members end */
 
 /* ---------------------------------------------- */
@@ -540,10 +555,13 @@ nav i {
 
 /* card end */
 
-/* table */
+/* ---------------------------------------------- */
+/* report start */
 .report-table {
     border-collapse: collapse;
     width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .report-header,
@@ -557,7 +575,7 @@ nav i {
     background-color: #f2f2f2;
 }
 
-/* table */
+/* report */
 
 /* ---------------------------------------------- */
 @media (min-width: 769px) {
