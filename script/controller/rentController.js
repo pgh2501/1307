@@ -111,6 +111,10 @@ class RentController {
   setEvent() {
     const rentForm = document.getElementById("rentForm");
     rentForm.addEventListener("submit", this.submitRent.bind(this));
+
+    // Nút in
+    const pdfButton = reportPopup.querySelector("#reportPopup .pdf-btn");
+    pdfButton.addEventListener("click", this.generatePDF.bind(this));
   }
 
   // Hàm làm tròn đến hàng nghìn
@@ -121,10 +125,15 @@ class RentController {
   // Hàm định dạng số thành tiền tệ Việt Nam
   formatCurrency(number) {
     const rounded = this.roundToThousands(number);
-    return rounded.toLocaleString("vi-VN", {
+
+    const short = (rounded / 1000).toLocaleString("vi-VN") + " k";
+
+    const full = rounded.toLocaleString("vi-VN", {
       style: "currency",
       currency: "VND",
     });
+
+    return { full: full, short: short };
   }
 
   submitRent(event) {
@@ -213,17 +222,29 @@ class RentController {
     // Thêm mã xử lý submit form của bạn ở đây
   }
 
-  displayReport(data, totallCosts) {
-    const container = document.getElementById("reportPopup");
+  displayReport(personalCosts, totallCosts) {
+    const reportPopup = document.getElementById("reportPopup");
 
-    const table = this.createReportTable(data, totallCosts);
-    container.innerHTML = ""; // Xóa nội dung cũ
-    container.appendChild(table);
+    // Nội dung report
+    const printContent = reportPopup.querySelector(".report-content");
+    printContent.innerHTML = "";
+
+    const h1Element = document.createElement("h1");
+    h1Element.textContent = "Test in báo cáo + xuất file pdf";
+    printContent.appendChild(h1Element);
+
+    const h2Element = document.createElement("h2");
+    h2Element.textContent =
+      "Tổng cộng: " + this.formatCurrency(totallCosts).full;
+    printContent.appendChild(h2Element);
+
+    const table = this.createReportTable(personalCosts);
+    printContent.appendChild(table);
 
     openForm("reportPopup");
   }
 
-  createReportTable(data, totallCosts) {
+  createReportTable(data) {
     const table = document.createElement("table");
     table.classList.add("report-table");
     table.id = "report";
@@ -243,9 +264,9 @@ class RentController {
       const dataRow = table.insertRow();
       const cells = [
         member,
-        rowData.personalCost,
-        rowData.personalExpenses,
-        rowData.payableCost,
+        rowData.personalCost.short,
+        rowData.personalExpenses.short,
+        rowData.payableCost.short,
       ];
       cells.forEach((cellText) => {
         const dataCell = dataRow.insertCell();
@@ -253,45 +274,31 @@ class RentController {
         dataCell.classList.add("report-cell");
       });
     }
-
-    const h1Element = document.createElement("h1");
-    h1Element.textContent = "Test in báo cáo + xuất file pdf";
-
-    const h2Element = document.createElement("h2");
-    h2Element.textContent = "Tổng cộng: " + this.formatCurrency(totallCosts);
-
-    // Tạo nút in
-    const printButton = document.createElement("button");
-    printButton.textContent = "In báo cáo";
-    printButton.classList.add("print-button");
-    printButton.addEventListener("click", this.generatePDF.bind(this));
-
-    // Thêm nút in vào bảng hoặc một phần tử container khác
-    const container = document.createElement("div"); // Tạo một container để chứa bảng và nút in
-    container.appendChild(h1Element);
-    container.appendChild(h2Element);
-    container.appendChild(table);
-    container.appendChild(printButton);
-
-    return container; // Trả về container thay vì table
+    return table;
   }
 
   generatePDF() {
     if (this.jsPDF) {
       const doc = new this.jsPDF();
-      const elementHTML = document.querySelector("#report");
+      const elementHTML = document.querySelector(
+        "#reportPopup .report-content"
+      );
 
       doc.addFileToVFS("Roboto-Regular.ttf", robotoBase64);
       doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
       doc.setFont("Roboto");
 
+      const pageWidthPt = doc.internal.pageSize.getWidth(); // Chiều rộng trang PDF (pt)
+      const contentWidthPt = 170; // Chiều rộng nội dung HTML (pt)
+      const xPt = (pageWidthPt - contentWidthPt) / 2; // Vị trí x (pt)
+
       doc.html(elementHTML, {
         callback: function (doc) {
           doc.save("report.pdf");
         },
-        x: 15,
+        x: xPt,
         y: 15,
-        width: 170,
+        width: contentWidthPt,
         windowWidth: 650,
       });
     } else {
