@@ -376,13 +376,24 @@ nav ul {
     display: block;
 }
 
+.rent-member-item-details .group-button {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rent-member-item-details input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
 .rent-member-item-details button {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
     padding: 10px;
     border-radius: 5px;
-    border: 1px solid #ccc;
     box-sizing: border-box;
 
     background-color: #0984e3;
@@ -575,6 +586,8 @@ nav i {
 }
 
 .report-table {
+    border-radius: 10px;
+    overflow: hidden;
     border-collapse: collapse;
     width: 100%;
 }

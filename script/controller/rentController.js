@@ -19,6 +19,8 @@ class RentController {
   }
 
   displayRentMembers(members) {
+    // Thêm xử lý kiểm tra tháng hiện tại đã tổng kết chưa
+
     const ul = document.querySelector(".rent-members-list");
     if (!Array.isArray(members) || members.length === 0) {
       ul.innerHTML = "<li>Nhà không có người hã???</li>";
@@ -56,12 +58,18 @@ class RentController {
           <label>Phí khác: <input type="number" name="otherPersonalFee-${
             member.id
           }" value="${member.default_other_fee}"></label>
-          <button type="button">Cập nhật</button>
+          <div class="group-button">
+            <button type="button">Cập nhật</button>
+            <input type="checkbox" checked>
+          </div>
         </div>
       `;
 
         const detailsBtn = li.querySelector("button");
-        detailsBtn.addEventListener("click", function () {
+        detailsBtn.addEventListener("click", function (event) {
+          // Ngăn chặn sự kiện click lan truyền lên li
+          event.stopPropagation();
+
           // Lấy giá trị từ các input
           const parkingInput = li.querySelector(
             `input[name="rentMemberParking-${member.id}"]`
@@ -93,6 +101,8 @@ class RentController {
           )}`;
           totalSpan.setAttribute("data-rent-total", newTotal);
 
+          closeForm();
+
           // Cập nhật member object (nếu cần)
           // const memberIndex = members.findIndex((m) => m.id === member.id);
           // if (memberIndex !== -1) {
@@ -104,6 +114,19 @@ class RentController {
           // member.default_other_fee = otherFee;
           // member.default_parking_fee = parkingFee;
         });
+
+        // Thêm sự kiện change cho checkbox
+        const calculateCheckbox = li.querySelector('input[type="checkbox"]');
+        const detailsDiv = li.querySelector(".rent-member-item-details");
+        calculateCheckbox.addEventListener("change", function () {
+          if (this.checked) {
+            li.style.backgroundColor = "";
+            detailsDiv.style.backgroundColor = "";
+          } else {
+            li.style.backgroundColor = "#ddd";
+            detailsDiv.style.backgroundColor = "#ddd";
+          }
+        });
         ul.appendChild(li);
       });
   }
@@ -112,8 +135,15 @@ class RentController {
     const rentForm = document.getElementById("rentForm");
     rentForm.addEventListener("submit", this.submitRent.bind(this));
 
-    // Nút in
-    const pdfButton = reportPopup.querySelector("#reportPopup .pdf-btn");
+    const reportButtonGroup = document.querySelector(
+      "#reportPopup .report-button"
+    );
+    // Lưu
+    const saveButton = reportButtonGroup.children[0];
+    saveButton.addEventListener("click", this.save.bind(this));
+
+    // PDF
+    const pdfButton = reportButtonGroup.children[1];
     pdfButton.addEventListener("click", this.generatePDF.bind(this));
   }
 
@@ -168,7 +198,16 @@ class RentController {
 
     // Lấy danh sách thành viên
     const memberItems = document.querySelectorAll(".rent-member-item");
-    const numMembers = memberItems.length;
+    const selectedMembers = []; // Danh sách thành viên được chọn
+    // Lọc ra các thành viên được chọn
+    memberItems.forEach((item) => {
+      const calculateCheckbox = item.querySelector('input[type="checkbox"]');
+      if (calculateCheckbox.checked) {
+        selectedMembers.push(item);
+      }
+    });
+
+    const numMembers = selectedMembers.length;
 
     // Lấy danh sách tiền đã chi cá nhân
     const expensesMap = new Map();
@@ -185,7 +224,7 @@ class RentController {
     const personalCosts = {};
     let totalPayableCost = 0;
 
-    memberItems.forEach((item) => {
+    selectedMembers.forEach((item) => {
       const memberName = item.querySelector("span:first-child").textContent;
 
       // Lấy chi phí riêng
@@ -275,6 +314,10 @@ class RentController {
       });
     }
     return table;
+  }
+
+  save() {
+    console.log("save funtion");
   }
 
   generatePDF() {
