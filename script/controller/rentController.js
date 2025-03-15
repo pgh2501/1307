@@ -52,12 +52,12 @@ class RentController {
         <div class="rent-member-item-details" id="rent-member-item-details-${
           member.id
         }">
-          <label>Phí giữ xe: <input type="number" name="rentMemberParking-${
-            member.id
-          }" value="${member.default_parking_fee}"></label>
-          <label>Phí khác: <input type="number" name="otherPersonalFee-${
-            member.id
-          }" value="${member.default_other_fee}"></label>
+          <label>Phí giữ xe: <input type="number" name="rentMemberParking" value="${
+            member.default_parking_fee
+          }"></label>
+          <label>Phí khác: <input type="number" name="otherPersonalFee" value="${
+            member.default_other_fee
+          }"></label>
           <div class="group-button">
             <button type="button">Cập nhật</button>
             <input type="checkbox" checked>
@@ -72,11 +72,9 @@ class RentController {
 
           // Lấy giá trị từ các input
           const parkingInput = li.querySelector(
-            `input[name="rentMemberParking-${member.id}"]`
+            `input[name="rentMemberParking"]`
           );
-          const otherInput = li.querySelector(
-            `input[name="otherPersonalFee-${member.id}"]`
-          );
+          const otherInput = li.querySelector(`input[name="otherPersonalFee"]`);
           const parkingFee = parseInt(parkingInput.value);
           const otherFee = parseInt(otherInput.value);
 
@@ -163,13 +161,14 @@ class RentController {
       currency: "VND",
     });
 
-    return { full: full, short: short };
+    return { full: full, short: short, normal: rounded };
   }
 
   submitRent(event) {
     event.preventDefault();
     // Tổng tất cả các phí
     let totallCosts = 0;
+    let totalOtherPersonalFee = 0;
 
     // Lấy giá trị phí chung
     const rentHouse =
@@ -204,6 +203,12 @@ class RentController {
       const calculateCheckbox = item.querySelector('input[type="checkbox"]');
       if (calculateCheckbox.checked) {
         selectedMembers.push(item);
+
+        const otherPersonalFee =
+          parseFloat(
+            item.querySelector('input[name="otherPersonalFee"]').value
+          ) || 0;
+        totalOtherPersonalFee += otherPersonalFee;
       }
     });
 
@@ -217,8 +222,10 @@ class RentController {
       expensesMap.set(memberId, expenseTotal);
     });
 
+    // Tính chi phí chung sau khi trừ otherPersonalFee
+    const adjustedGeneralCosts = generalCosts - totalOtherPersonalFee;
     // Tính toán Tiền chia đều
-    const averageCost = numMembers > 0 ? generalCosts / numMembers : 0;
+    const averageCost = numMembers > 0 ? adjustedGeneralCosts / numMembers : 0;
 
     // Tính toán Tiền phải đóng của mỗi thành viên
     const personalCosts = {};
@@ -226,13 +233,24 @@ class RentController {
 
     selectedMembers.forEach((item) => {
       const memberName = item.querySelector("span:first-child").textContent;
+      const rentMemberParking =
+        parseFloat(
+          item.querySelector('input[name="rentMemberParking"]').value
+        ) || 0;
+      const otherPersonalFee =
+        parseFloat(
+          item.querySelector('input[name="otherPersonalFee"]').value
+        ) || 0;
 
       // Lấy chi phí riêng
       const rentTotal = parseFloat(item.dataset.rentTotal) || 0;
       // Tính toán tổng chi phí cá nhân
-      const personalCost = averageCost + rentTotal;
+      let personalCost = averageCost + rentMemberParking;
+      if (otherPersonalFee > 0) {
+        personalCost += otherPersonalFee;
+      }
 
-      totallCosts += rentTotal;
+      totallCosts += rentMemberParking;
 
       // Lấy tiền đã chi cá nhân
       const memberId = item.dataset.memberId;
@@ -298,8 +316,16 @@ class RentController {
       headerRow.appendChild(headerCell);
     });
 
+    let personalCost = 0;
+    let personalExpenses = 0;
+    let payableCost = 0;
     for (const member in data) {
       const rowData = data[member];
+
+      personalCost += rowData.personalCost.normal;
+      personalExpenses += rowData.personalExpenses.normal;
+      payableCost += rowData.payableCost.normal;
+
       const dataRow = table.insertRow();
       const cells = [
         member,
@@ -313,6 +339,16 @@ class RentController {
         dataCell.classList.add("report-cell");
       });
     }
+
+    // Last row
+    const dataLastRow = table.insertRow();
+    const cells = ["Tổng", personalCost, personalExpenses, payableCost];
+    cells.forEach((cellText) => {
+      const dataCell = dataLastRow.insertCell();
+      dataCell.textContent = cellText;
+      dataCell.classList.add("report-header");
+    });
+
     return table;
   }
 
